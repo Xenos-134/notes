@@ -1,4 +1,4 @@
-import {View, StyleSheet, Text} from "react-native";
+import {View, StyleSheet, Text, Vibration} from "react-native";
 import Animated, {
     runOnJS, useAnimatedGestureHandler,
     useAnimatedStyle,
@@ -7,7 +7,7 @@ import Animated, {
     withRepeat,
     withTiming
 } from "react-native-reanimated";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 
 
@@ -17,13 +17,18 @@ type ContextType = {
 };
 
 export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coord}) {
-    const sharedValue = useSharedValue(-100);
+    //SHARED VALUES
     const position_y = useSharedValue(y_coord);
     const position_x = useSharedValue(x_coord);
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
+    const todoState = useSharedValue(0);
+    //Standart states and refs
+    const [active, setActive] = useState(0);
+    const touchTimer = useRef(null);
 
 
     useEffect(()=>{
-        sharedValue.value = withRepeat(withTiming(100, {duration: 1000}), -1, true);
         if(y_coord && x_coord){
             position_y.value= y_coord;
             position_x.value= x_coord;
@@ -31,17 +36,73 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     },[])
 
 
+    useEffect(()=> {
+        console.log("CHANGING STATE", active);
+        if(active == 3) {
+            resetTimer();
+            return;
+        }
+
+        if (active == 1) {
+            activateTimer();
+            return;
+        }
+
+        if(active == 2) {
+            Vibration.vibrate(50);
+        }
+
+    }, [active])
+
+
+
+    /*
+*  0 - NOT ACTIVE
+*  1 - WAITING FOR SECOND PHASE
+*  2 - ACTIVATED
+*  3 - CANCELED
+* */
+
+    function activateTimer() {
+        touchTimer.current =  setTimeout(function () {
+            console.log(">>>>ACTIVATION", active);
+            todoState.value = 2;
+            setActive(2);
+        }, 1000);
+    }
+
+    function resetTimer() {
+        clearTimeout(touchTimer.current);
+    }
+
+    function changeStateFromWorker(value) {
+        setActive(value);
+    }
+
+    useDerivedValue(() => {
+        if(todoState.value == 2) return;
+        runOnJS(changeStateFromWorker)(todoState.value);
+    }, [todoState.value])
+
     const panGestureEvent = useAnimatedGestureHandler<
         PanGestureHandlerGestureEvent, ContextType>({
         onStart: (event, context) => {
             console.log("TOUCH DETECTED");
-            context.translateY = coordenatesY.value;
-            context.translateX = coordenatesX.value;
+            context.translateY = translateY.value;
+            context.translateX = translateX.value;
+            todoState.value = 1;
         },
         onActive: (event, context) => {
             //TODO ADICIONAR AQUELA PARTE DE ATIVAR O ELEMENTO ATRAVES DE TOQUE CONTINUO
-            coordenatesX.value = event.translationX + context.translateX;
-            coordenatesY.value = event.translationY + context.translateY;
+
+
+            if(todoState.value == 2) {
+                translateX.value = event.translationX + context.translateX;
+                translateY.value = event.translationY + context.translateY;
+            } else {
+                coordenatesX.value = event.translationX + context.translateX;
+                coordenatesY.value = event.translationY + context.translateY;
+            }
         },
         onEnd: () => {
 
@@ -53,8 +114,8 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     const rStyle = useAnimatedStyle(() => {
         return {
             transform: [
-                { translateX : coordenatesX.value + position_x.value},
-                { translateY : coordenatesY.value + position_y.value},
+                { translateX : coordenatesX.value + position_x.value + translateX.value},
+                { translateY : coordenatesY.value + position_y.value + translateY.value},
                 {scale : 0.7}
             ],
         };
