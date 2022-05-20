@@ -14,14 +14,21 @@ import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-ges
 type ContextType = {
     translateX: number;
     translateY: number;
+
+    translateXParent: number;
+    translateYParent: number;
 };
 
 export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coord}) {
     //SHARED VALUES
     const position_y = useSharedValue(y_coord);
     const position_x = useSharedValue(x_coord);
-    const translateX = useSharedValue(0);
-    const translateY = useSharedValue(0);
+    const translateX = useSharedValue(coordenatesX.value);
+    const translateY = useSharedValue(coordenatesY.value);
+
+    const translateXParent = useSharedValue(coordenatesX.value);
+    const translateYParent = useSharedValue(coordenatesY.value);
+
     const todoState = useSharedValue(0);
     //Standart states and refs
     const [active, setActive] = useState(0);
@@ -29,6 +36,8 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
 
     useEffect(()=>{
+        console.log(coordenatesX.value, coordenatesY.value);
+
         if(y_coord && x_coord){
             position_y.value= y_coord;
             position_x.value= x_coord;
@@ -37,7 +46,7 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
 
     useEffect(()=> {
-        console.log("CHANGING STATE", active);
+        //console.log("CHANGING STATE", active);
         if(active == 3) {
             resetTimer();
             return;
@@ -65,7 +74,7 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
     function activateTimer() {
         touchTimer.current =  setTimeout(function () {
-            console.log(">>>>ACTIVATION", active);
+            //console.log(">>>>ACTIVATION", active);
             todoState.value = 2;
             setActive(2);
         }, 1000);
@@ -87,24 +96,38 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     const panGestureEvent = useAnimatedGestureHandler<
         PanGestureHandlerGestureEvent, ContextType>({
         onStart: (event, context) => {
-            console.log("TOUCH DETECTED");
-            context.translateY = translateY.value;
-            context.translateX = translateX.value;
+
+            context.translateY =  translateY.value;
+            context.translateX =  translateX.value;
+
+
+            context.translateXParent = coordenatesX.value;
+            context.translateYParent = coordenatesY.value;
+
             todoState.value = 1;
         },
         onActive: (event, context) => {
-            //TODO ADICIONAR AQUELA PARTE DE ATIVAR O ELEMENTO ATRAVES DE TOQUE CONTINUO
-
-
             if(todoState.value == 2) {
                 translateX.value = event.translationX + context.translateX;
                 translateY.value = event.translationY + context.translateY;
+
             } else {
-                coordenatesX.value = event.translationX + context.translateX;
-                coordenatesY.value = event.translationY + context.translateY;
+                //TODO -> EXISTE ALGUM BUG AQUI QUE FAZ O ELEMENTO SALRAR QUANDO ESTAMOS A MOVER O ELEMENTO
+
+                coordenatesX.value = event.translationX + context.translateXParent;
+                coordenatesY.value = event.translationY + context.translateYParent;
+
+
             }
         },
-        onEnd: () => {
+
+        onFinish:()=>{
+            todoState.value = 3;
+            console.log(coordenatesX.value, coordenatesY.value);
+        },
+        onEnd: (event, context) => {
+            todoState.value = 0;
+            console.log("END",context.translateX, context.translateY)
 
         },
     });
@@ -116,7 +139,7 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
             transform: [
                 { translateX : coordenatesX.value + position_x.value + translateX.value},
                 { translateY : coordenatesY.value + position_y.value + translateY.value},
-                {scale : 0.7}
+                {scale : 1}
             ],
         };
     });
