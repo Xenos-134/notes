@@ -36,7 +36,7 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
 
     useEffect(()=>{
-        console.log(coordenatesX.value, coordenatesY.value);
+        console.log(x_coord, y_coord);
 
         if(y_coord && x_coord){
             position_y.value= y_coord;
@@ -100,7 +100,6 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
             context.translateY =  translateY.value;
             context.translateX =  translateX.value;
 
-
             context.translateXParent = coordenatesX.value;
             context.translateYParent = coordenatesY.value;
 
@@ -112,22 +111,16 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
                 translateY.value = event.translationY + context.translateY;
 
             } else {
-                //TODO -> EXISTE ALGUM BUG AQUI QUE FAZ O ELEMENTO SALRAR QUANDO ESTAMOS A MOVER O ELEMENTO
-
-                coordenatesX.value = event.translationX + context.translateXParent;
-                coordenatesY.value = event.translationY + context.translateYParent;
-
-
+                coordenatesX.value = -event.translationX + context.translateXParent;
+                coordenatesY.value = -event.translationY + context.translateYParent;
             }
         },
 
         onFinish:()=>{
             todoState.value = 3;
-            console.log(coordenatesX.value, coordenatesY.value);
         },
         onEnd: (event, context) => {
             todoState.value = 0;
-            console.log("END",context.translateX, context.translateY)
 
         },
     });
@@ -137,8 +130,8 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     const rStyle = useAnimatedStyle(() => {
         return {
             transform: [
-                { translateX : coordenatesX.value + position_x.value + translateX.value},
-                { translateY : coordenatesY.value + position_y.value + translateY.value},
+                { translateX : -coordenatesX.value + position_x.value + translateX.value},
+                { translateY : -coordenatesY.value + position_y.value + translateY.value},
                 {scale : 1}
             ],
         };

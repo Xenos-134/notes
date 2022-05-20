@@ -12,7 +12,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 type ContextType = {
     translateX: number;
@@ -22,10 +22,23 @@ type ContextType = {
 export default function App() {
     const transformValueX = useSharedValue(0);
     const transformValueY = useSharedValue(0);
-    const [notesList, setNotes] = useState([{x:100, y: 100}, {x: 50, y: 250}, {x: 100, y: 350}]);
 
-    //transformValue.value =  withRepeat(withTiming(400, {duration: 2000}), -1, true);
+    const [notesList, setNotes] = useState([]);
 
+    const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
+
+    useEffect(()=>{
+       // console.log("UPDATE CURRENT FOCUS POINT: ", currentFocusPoint);
+    },[currentFocusPoint])
+
+    useDerivedValue(() => {
+        runOnJS(updateCurrentFocusPosition)(transformValueX.value, transformValueY.value);
+    },[transformValueX.value, transformValueY.value]);
+
+    function updateCurrentFocusPosition(newX, newY) {
+        //console.log("NEW VALUES")
+        setCurrentFocus({x:-newX, y: -newY});
+    }
 
 
     const panGestureEvent = useAnimatedGestureHandler<
@@ -35,8 +48,8 @@ export default function App() {
             context.translateX = transformValueX.value;
         },
         onActive: (event, context) => {
-            transformValueY.value = event.translationY + context.translateY;
-            transformValueX.value = event.translationX + context.translateX;
+            transformValueY.value = -event.translationY + context.translateY;
+            transformValueX.value = -event.translationX + context.translateX;
         },
         onEnd: () => {
 
@@ -44,15 +57,20 @@ export default function App() {
     });
 
 
-    function addNewNote() {
+
+    function addNewNote2() {
         const noteListCoppy = notesList;
-        noteListCoppy.push({x: 50, y: 500});
+        console.log(currentFocusPoint.x, currentFocusPoint.y);
+
+        const newt = {x: 100 , y: 100};
+        noteListCoppy.push(newt);
+
+        console.log("CREATED NEW NOTE AT: ", newt);
         setNotes([...noteListCoppy]);
     }
 
-
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureHandlerRootView style={{ flex: 1}}>
             <PanGestureHandler onGestureEvent={panGestureEvent}>
                 <Animated.View style={styles.animated_view}>
                     <View style={styles.container}>
@@ -61,15 +79,18 @@ export default function App() {
                                 <TodoSticker
                                     coordenatesX={transformValueX} //Movement of all referential
                                     coordenatesY={transformValueY}
-                                    y_coord={elm.x}   //Initial Coords
-                                    x_coord={elm.y}
+                                    y_coord={elm.y}   //Initial Coords
+                                    x_coord={elm.x}
                                 />
                             ))
                         }
                     </View>
+                    <View style={{position:"absolute", top:currentFocusPoint.y + 50, left:currentFocusPoint.x + 50, backgroundColor:"green", width: 50, height:50}}>
+                        <Text>ORIGIN</Text>
+                    </View>
                 </Animated.View>
             </PanGestureHandler>
-            <Button title={"TEST"} onPress={addNewNote}/>
+            <Button title={"TEST"} onPress={addNewNote2} color={"red"}  />
         </GestureHandlerRootView>
     );
 }
