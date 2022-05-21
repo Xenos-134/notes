@@ -1,4 +1,3 @@
-import { StatusBar } from 'expo-status-bar';
 import {Button, StyleSheet, Text, View} from 'react-native';
 import Animated, {
     runOnJS,
@@ -17,6 +16,8 @@ import TodoSticker from "./custom_components/TodoStickerView";
 import NewNoteButton from "./custom_components/Buttons/NewNoteButton";
 import ScaleUpButton from "./custom_components/Buttons/ScaleUpButton";
 import ScaleDownButton from "./custom_components/Buttons/ScaleDownButton";
+import {NoteClass} from "./custom_classes/NoteClass";
+import {RepositoryHook} from "./BD/RepositoryHook";
 
 type ContextType = {
     translateX: number;
@@ -24,16 +25,22 @@ type ContextType = {
 };
 
 export default function App() {
+    //===========================================================
+    //              SHARED VALUES
+    //===========================================================
     const transformValueX = useSharedValue(0);
     const transformValueY = useSharedValue(0);
     const scaleValue = useSharedValue(0.5);
 
+    //===========================================================
+    //              LOCAL STATES
+    //===========================================================
     const [notesList, setNotes] = useState([{x: 0 , y: 0},
         {x: 233 , y: -19},
         {x: 224 , y: 225}
     ]);
-
     const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
+    const repository = RepositoryHook();
 
 
 
@@ -62,6 +69,10 @@ export default function App() {
     });
 
 
+    //===========================================================
+    //              LOCAL METHODS
+    //===========================================================
+
     function addNewNote() {
         const noteListCoppy = notesList;
         console.log(-currentFocusPoint.x, -currentFocusPoint.y);
@@ -71,6 +82,10 @@ export default function App() {
 
         console.log("CREATED NEW NOTE AT: ", newt);
         setNotes([...noteListCoppy]);
+
+        const newNote = new NoteClass("TEST TITLE", "LOREM IPSUM BODY");
+        repository.add(newNote);
+
     }
 
     function scaleUp() {
