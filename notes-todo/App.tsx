@@ -1,8 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
 import {Button, StyleSheet, Text, View} from 'react-native';
-
-//CUSTOM COMPONENTS IMPORT
-import TodoSticker from "./custom_components/TodoStickerView";
 import Animated, {
     runOnJS,
     useAnimatedGestureHandler,
@@ -14,6 +11,13 @@ import Animated, {
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 import {useEffect, useRef, useState} from "react";
 
+
+//CUSTOM COMPONENTS IMPORT
+import TodoSticker from "./custom_components/TodoStickerView";
+import NewNoteButton from "./custom_components/Buttons/NewNoteButton";
+import ScaleUpButton from "./custom_components/Buttons/ScaleUpButton";
+import ScaleDownButton from "./custom_components/Buttons/ScaleDownButton";
+
 type ContextType = {
     translateX: number;
     translateY: number;
@@ -22,21 +26,22 @@ type ContextType = {
 export default function App() {
     const transformValueX = useSharedValue(0);
     const transformValueY = useSharedValue(0);
+    const scaleValue = useSharedValue(0.5);
 
-    const [notesList, setNotes] = useState([]);
+    const [notesList, setNotes] = useState([{x: 0 , y: 0},
+        {x: 233 , y: -19},
+        {x: 224 , y: 225}
+    ]);
 
     const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
 
-    useEffect(()=>{
-       // console.log("UPDATE CURRENT FOCUS POINT: ", currentFocusPoint);
-    },[currentFocusPoint])
+
 
     useDerivedValue(() => {
         runOnJS(updateCurrentFocusPosition)(transformValueX.value, transformValueY.value);
     },[transformValueX.value, transformValueY.value]);
 
     function updateCurrentFocusPosition(newX, newY) {
-        //console.log("NEW VALUES")
         setCurrentFocus({x:-newX, y: -newY});
     }
 
@@ -48,8 +53,8 @@ export default function App() {
             context.translateX = transformValueX.value;
         },
         onActive: (event, context) => {
-            transformValueY.value = -event.translationY + context.translateY;
-            transformValueX.value = -event.translationX + context.translateX;
+            transformValueY.value = -event.translationY * (1/scaleValue.value) + context.translateY;
+            transformValueX.value = -event.translationX * (1/scaleValue.value)  + context.translateX;
         },
         onEnd: () => {
 
@@ -57,16 +62,23 @@ export default function App() {
     });
 
 
-
-    function addNewNote2() {
+    function addNewNote() {
         const noteListCoppy = notesList;
-        console.log(currentFocusPoint.x, currentFocusPoint.y);
+        console.log(-currentFocusPoint.x, -currentFocusPoint.y);
 
-        const newt = {x: 100 , y: 100};
+        const newt = {x: 0 , y: 0};
         noteListCoppy.push(newt);
 
         console.log("CREATED NEW NOTE AT: ", newt);
         setNotes([...noteListCoppy]);
+    }
+
+    function scaleUp() {
+        scaleValue.value+=0.2;
+    }
+
+    function scaleDown() {
+        scaleValue.value-=0.2;
     }
 
     return (
@@ -81,16 +93,26 @@ export default function App() {
                                     coordenatesY={transformValueY}
                                     y_coord={elm.y}   //Initial Coords
                                     x_coord={elm.x}
+                                    scale={scaleValue}
                                 />
                             ))
                         }
                     </View>
-                    <View style={{position:"absolute", top:currentFocusPoint.y + 50, left:currentFocusPoint.x + 50, backgroundColor:"green", width: 50, height:50}}>
+                    <View style={{
+                        position:"absolute",
+                        top:currentFocusPoint.y + 50,
+                        left:currentFocusPoint.x + 50,
+                        backgroundColor:"green", width: 50, height:50
+                    }}>
+
                         <Text>ORIGIN</Text>
                     </View>
+                    <ScaleUpButton func={scaleUp}/>
+                    <ScaleDownButton func={scaleDown}/>
+                    <NewNoteButton func={addNewNote}/>
                 </Animated.View>
             </PanGestureHandler>
-            <Button title={"TEST"} onPress={addNewNote2} color={"red"}  />
+
         </GestureHandlerRootView>
     );
 }
@@ -106,19 +128,3 @@ const styles = StyleSheet.create({
         flex: 1,
     }
 });
-
-/*
-*                         <TodoSticker
-                            coordenatesX={transformValueX} //Movement of all referential
-                            coordenatesY={transformValueY}
-                            y_coord={100}   //Initial Coords
-                            x_coord={100}
-                        />
-
-                        <TodoSticker
-                            coordenatesX={transformValueX} //Movement of all referential
-                            coordenatesY={transformValueY}
-                            y_coord={500}   //Initial Coords
-                            x_coord={-100}
-                        />
-                        * */

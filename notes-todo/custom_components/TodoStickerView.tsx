@@ -19,7 +19,16 @@ type ContextType = {
     translateYParent: number;
 };
 
-export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coord}) {
+export default function TodoSticker(
+    {
+        coordenatesX,
+        coordenatesY,
+        x_coord,
+        y_coord,
+        scale
+    }) {
+    const scaleValue = 0.6;
+
     //SHARED VALUES
     const position_y = useSharedValue(y_coord);
     const position_x = useSharedValue(x_coord);
@@ -36,7 +45,6 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
 
     useEffect(()=>{
-        console.log(x_coord, y_coord);
 
         if(y_coord && x_coord){
             position_y.value= y_coord;
@@ -46,7 +54,6 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
 
 
     useEffect(()=> {
-        //console.log("CHANGING STATE", active);
         if(active == 3) {
             resetTimer();
             return;
@@ -64,7 +71,6 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     }, [active])
 
 
-
     /*
 *  0 - NOT ACTIVE
 *  1 - WAITING FOR SECOND PHASE
@@ -77,7 +83,7 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
             //console.log(">>>>ACTIVATION", active);
             todoState.value = 2;
             setActive(2);
-        }, 1000);
+        }, 750);
     }
 
     function resetTimer() {
@@ -106,13 +112,18 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
             todoState.value = 1;
         },
         onActive: (event, context) => {
+            //ESTAMSO A MULTIPLICAR POR 1/SCALE VALUE PORQUE SE HOUVER SCALE AS COORDENADAS TABEM TEM QUE MODAR PROPORCAO
+
             if(todoState.value == 2) {
-                translateX.value = event.translationX + context.translateX;
-                translateY.value = event.translationY + context.translateY;
+                translateX.value = event.translationX * (1/scale.value) + context.translateX;
+                translateY.value = event.translationY * (1/scale.value) + context.translateY;
 
             } else {
-                coordenatesX.value = -event.translationX + context.translateXParent;
-                coordenatesY.value = -event.translationY + context.translateYParent;
+                if((Math.abs(event.translationX) + Math.abs(event.translationY)) > 200/2 * scale.value) {
+                    todoState.value = 3;
+                }
+                coordenatesX.value = -event.translationX * (1/scale.value) + context.translateXParent;
+                coordenatesY.value = -event.translationY * (1/scale.value) + context.translateYParent;
             }
         },
 
@@ -126,16 +137,16 @@ export default function TodoSticker({coordenatesX, coordenatesY, x_coord, y_coor
     });
 
 
-
     const rStyle = useAnimatedStyle(() => {
         return {
             transform: [
-                { translateX : -coordenatesX.value + position_x.value + translateX.value},
-                { translateY : -coordenatesY.value + position_y.value + translateY.value},
-                {scale : 1}
+                { translateX : scale.value*(-coordenatesX.value + position_x.value + translateX.value)},
+                { translateY : scale.value*(-coordenatesY.value + position_y.value + translateY.value)},
+                {scale : scale.value}
             ],
         };
     });
+
 
     return(
         <PanGestureHandler onGestureEvent={panGestureEvent}>
