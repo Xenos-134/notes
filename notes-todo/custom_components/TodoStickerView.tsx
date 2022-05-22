@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import {useEffect, useRef, useState} from "react";
 import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
+import {RepositoryHook} from "../BD/RepositoryHook";
 
 
 type ContextType = {
@@ -25,27 +26,33 @@ export default function TodoSticker(
         coordenatesY,
         x_coord,
         y_coord,
-        scale
+        scale,
+        noteId,
     }) {
-    const scaleValue = 0.6;
-
-    //SHARED VALUES
+    //===========================================================
+    //              SHARED VALUES
+    //===========================================================
     const position_y = useSharedValue(y_coord);
     const position_x = useSharedValue(x_coord);
     const translateX = useSharedValue(coordenatesX.value);
     const translateY = useSharedValue(coordenatesY.value);
-
     const translateXParent = useSharedValue(coordenatesX.value);
     const translateYParent = useSharedValue(coordenatesY.value);
-
     const todoState = useSharedValue(0);
-    //Standart states and refs
+
+    const isFinished = useSharedValue(false);
+    //===========================================================
+    //              STANDARD HOOKS AND REFS
+    //===========================================================
     const [active, setActive] = useState(0);
     const touchTimer = useRef(null);
+    const repository = RepositoryHook();
 
 
+    //===========================================================
+    //              USE EFFECT SECTION
+    //===========================================================
     useEffect(()=>{
-
         if(y_coord && x_coord){
             position_y.value= y_coord;
             position_x.value= x_coord;
@@ -93,6 +100,22 @@ export default function TodoSticker(
         setActive(value);
     }
 
+
+    //===========================================================
+    //              USE DERIVED VALUES SECTION
+    //===========================================================
+    useDerivedValue(() => {
+        if(isFinished.value) {
+            runOnJS(repository.updateElement)(noteId, translateX.value, translateY.value);
+            isFinished.value = false;
+        }
+    }, [isFinished.value])
+
+    function testF(id, arg1, arg2) {
+        console.log("RECEIVED ARGUMENTS: ", arg1, arg2);
+    }
+
+
     useDerivedValue(() => {
         if(todoState.value == 2) return;
         runOnJS(changeStateFromWorker)(todoState.value);
@@ -131,6 +154,11 @@ export default function TodoSticker(
         },
         onEnd: (event, context) => {
             todoState.value = 0;
+            console.log("END -> ID: ", noteId);
+            console.log("NEW POSITION:", translateX.value, translateY.value);
+            //TODO FAZER UPDATE DE POSICAO DO ELEMENTO AQUI
+            isFinished.value = true;
+            //repository.updateElement(noteId, translateX.value, translateY.value);
 
         },
     });

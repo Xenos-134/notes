@@ -36,8 +36,7 @@ export default function App() {
     //===========================================================
     //              LOCAL STATES
     //===========================================================
-    const [notesList, setNotes] = useState([
-    ]);
+    const [notesList, setNotes] = useState([]);
     const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
     const repository = RepositoryHook();
 
@@ -50,6 +49,7 @@ export default function App() {
     },[])
 
     async function loadAllNotes() {
+        await repository.loadNotesList();
         const notes = await repository.getAllNotes();
         setNotes(notes);
         console.log("LOADED ALL NOTES:", notes);
@@ -99,7 +99,7 @@ export default function App() {
         const newt = Object.assign({}, newNote);
         newt._x = 0;
         newt._y = 0;
-        console.log(newt);
+        //console.log(newt);
         noteListCoppy.push(newt);
         setNotes([...noteListCoppy]);
 
@@ -128,6 +128,7 @@ export default function App() {
                                     y_coord={elm._y}   //Initial Coords
                                     x_coord={elm._x}
                                     scale={scaleValue}
+                                    noteId={elm._id}
                                 />
                             ))
                         }
