@@ -107,8 +107,8 @@ export default function TodoSticker(
     useDerivedValue(() => {
         if(isFinished.value) {
             runOnJS(repository.updateElement)(noteId,
-                scale.value* (-coordenatesX.value + position_x.value + translateX.value),
-                scale.value* (-coordenatesY.value + position_y.value + translateY.value)
+                position_x.value + translateX.value,
+                position_y.value + translateY.value
             );
             isFinished.value = false;
         }
