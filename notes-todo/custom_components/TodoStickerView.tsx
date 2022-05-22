@@ -80,7 +80,6 @@ export default function TodoSticker(
 
     function activateTimer() {
         touchTimer.current =  setTimeout(function () {
-            //console.log(">>>>ACTIVATION", active);
             todoState.value = 2;
             setActive(2);
         }, 750);

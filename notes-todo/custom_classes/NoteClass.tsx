@@ -25,4 +25,11 @@ export class NoteClass {
     getId(): string {
         return this._id;
     }
+
+    updatePosition(x:number, y:number): NoteClass {
+        this._x = x;
+        this._y = y;
+
+        return this;
+    }
 }

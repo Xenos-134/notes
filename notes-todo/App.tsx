@@ -32,16 +32,28 @@ export default function App() {
     const transformValueY = useSharedValue(0);
     const scaleValue = useSharedValue(0.5);
 
+
     //===========================================================
     //              LOCAL STATES
     //===========================================================
-    const [notesList, setNotes] = useState([{x: 0 , y: 0},
-        {x: 233 , y: -19},
-        {x: 224 , y: 225}
+    const [notesList, setNotes] = useState([
     ]);
     const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
     const repository = RepositoryHook();
 
+
+    //===========================================================
+    //              USE EFFECT SECTION
+    //===========================================================
+    useEffect(()=>{
+        loadAllNotes();
+    },[])
+
+    async function loadAllNotes() {
+        const notes = await repository.getAllNotes();
+        setNotes(notes);
+        console.log("LOADED ALL NOTES:", notes);
+    }
 
 
     useDerivedValue(() => {
@@ -75,16 +87,22 @@ export default function App() {
 
     function addNewNote() {
         const noteListCoppy = notesList;
-        console.log(-currentFocusPoint.x, -currentFocusPoint.y);
+        //console.log(-currentFocusPoint.x, -currentFocusPoint.y);
+        const newNote = new NoteClass("TEST TITLE", "LOREM IPSUM BODY");
 
-        const newt = {x: 0 , y: 0};
+        newNote._x = -currentFocusPoint.x;
+        newNote._y = -currentFocusPoint.y;
+        repository.add(newNote);
+        //console.log("CREATED NEW ITEM", newNote);
+
+
+        const newt = Object.assign({}, newNote);
+        newt._x = 0;
+        newt._y = 0;
+        console.log(newt);
         noteListCoppy.push(newt);
-
-        console.log("CREATED NEW NOTE AT: ", newt);
         setNotes([...noteListCoppy]);
 
-        const newNote = new NoteClass("TEST TITLE", "LOREM IPSUM BODY");
-        repository.add(newNote);
 
     }
 
@@ -104,10 +122,11 @@ export default function App() {
                         {
                             notesList.map(elm => (
                                 <TodoSticker
+                                    key={elm._id}
                                     coordenatesX={transformValueX} //Movement of all referential
                                     coordenatesY={transformValueY}
-                                    y_coord={elm.y}   //Initial Coords
-                                    x_coord={elm.x}
+                                    y_coord={elm._y}   //Initial Coords
+                                    x_coord={elm._x}
                                     scale={scaleValue}
                                 />
                             ))
@@ -115,8 +134,8 @@ export default function App() {
                     </View>
                     <View style={{
                         position:"absolute",
-                        top:currentFocusPoint.y + 50,
-                        left:currentFocusPoint.x + 50,
+                        top:currentFocusPoint.y,
+                        left:currentFocusPoint.x,
                         backgroundColor:"green", width: 50, height:50
                     }}>
 
