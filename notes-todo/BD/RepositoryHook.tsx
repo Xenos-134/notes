@@ -9,7 +9,7 @@ export function RepositoryHook() {
 
     useEffect(()=>{
         //console.log("ADDED NEW ITEM: ", _itemArray);
-        if(_itemArray.length == 0) return;
+        if(!_itemArray || _itemArray.length == 0) return;
         AsyncStorage.setItem('@notesList', JSON.stringify(_itemArray));
     },[_itemArray]);
 
@@ -50,7 +50,9 @@ export function RepositoryHook() {
         return parsedList;
     }
 
-    function updateElement(elementId: string, x:number, y:number) {
+    async function updateElement(elementId: string, x:number, y:number) {
+        //NOTA: ISTO ESTA MUITO MAL FEITO POIS CADA ALTERACAO OBRIGA A CARREGAR TODA A LISTA
+
         console.log("TRYING TO UPDATE ELEMENT:", elementId);
         /*
         *       Aqui estou na duvida como fazer:
@@ -58,17 +60,25 @@ export function RepositoryHook() {
         *   2 - Dar return tanto em async storage como em AsyncStorage
         * */
 
-        var itemArrayCopy = _itemArray;
-        console.log("TEST:", _itemArray);
+        var itemArrayCopy = await getAllNotes();
+        //TODO -> Verificar se aqui vai ser preciso usar as promisses para ter o elemento
 
-        for(var i = 0; i < itemArrayCopy.length; i++) {
+        for (var i = 0; i < itemArrayCopy.length; i++) {
             if(itemArrayCopy[i]._id === elementId) {
                 itemArrayCopy[i]._x = x;
                 itemArrayCopy[i]._y = y;
             }
         }
 
-        console.log("NEW CAHNGE POSITION: ",itemArrayCopy);
+
+
+        itemArrayCopy = JSON.stringify(itemArrayCopy);
+
+
+        await AsyncStorage.setItem('@notesList', itemArrayCopy);
+
+        const newListx = await getAllNotes();
+        console.log("NEW CHANGED POSITION: ",newListx);
     }
 
 

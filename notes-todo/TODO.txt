@@ -2,5 +2,6 @@
     //              LOCAL METHODS                                //
     //===========================================================//
 
->>>Change function to generate id;
+>>> Change function to generate id;
+>>> Change way that we save items to storage
 

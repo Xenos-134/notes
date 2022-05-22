@@ -106,14 +106,13 @@ export default function TodoSticker(
     //===========================================================
     useDerivedValue(() => {
         if(isFinished.value) {
-            runOnJS(repository.updateElement)(noteId, translateX.value, translateY.value);
+            runOnJS(repository.updateElement)(noteId,
+                scale.value* (-coordenatesX.value + position_x.value + translateX.value),
+                scale.value* (-coordenatesY.value + position_y.value + translateY.value)
+            );
             isFinished.value = false;
         }
     }, [isFinished.value])
-
-    function testF(id, arg1, arg2) {
-        console.log("RECEIVED ARGUMENTS: ", arg1, arg2);
-    }
 
 
     useDerivedValue(() => {
