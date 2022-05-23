@@ -1,7 +1,10 @@
     //===========================================================//
-    //              LOCAL METHODS                                //
+    //                          TODO                             //
     //===========================================================//
 
 >>> Change function to generate id;
->>> Change way that we save items to storage
+>>> Change way that we save items to storage;
+>>> Add functionality to move referential when item is at margin;
+
+> Se tiver tempo fazer um metodo que calcula conjunto atual mais proximo
 

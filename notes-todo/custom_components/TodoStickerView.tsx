@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {useEffect, useRef, useState} from "react";
-import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
+import {PanGestureHandler, PanGestureHandlerGestureEvent, TapGestureHandler} from "react-native-gesture-handler";
 import {RepositoryHook} from "../BD/RepositoryHook";
 
 
@@ -28,6 +28,7 @@ export default function TodoSticker(
         y_coord,
         scale,
         noteId,
+        editNoteMethod,
     }) {
     //===========================================================
     //              SHARED VALUES
@@ -45,8 +46,16 @@ export default function TodoSticker(
     //              STANDARD HOOKS AND REFS
     //===========================================================
     const [active, setActive] = useState(0);
-    const touchTimer = useRef(null);
+    const panTimer = useRef(null);
+    const [currentTapTime, setCurrentTapTime] = useState(0);
+    const [lastTapTime, setLastTapTime] = useState(0);
     const repository = RepositoryHook();
+    /*
+    * TAP STATE
+    *   0 - waiting for tap
+    *   1 - 1 tap
+    *   2 - second tap within defined interval
+    * */
 
 
     //===========================================================
@@ -60,18 +69,31 @@ export default function TodoSticker(
     },[])
 
 
+    //Handles double tap
+    useEffect(()=>{
+        if(currentTapTime == 0) return;
+        if(Math.abs(currentTapTime - lastTapTime) < 350) {
+            console.log("DOUBLE TAP DETECTED");
+            setCurrentTapTime(0)
+            editNoteHandler();
+        }
+        setLastTapTime(Date.now());
+    },[currentTapTime])
+
+
     useEffect(()=> {
-        if(active == 3) {
-            resetTimer();
+        if(active == 3) {   //Cancel
+            resetPanTimer();
+            setCurrentTapTime(Date.now());
             return;
         }
 
-        if (active == 1) {
-            activateTimer();
+        if (active == 1) {  //Activate Timer
+            activatePanTimer();
             return;
         }
 
-        if(active == 2) {
+        if(active == 2) {  //Virate
             Vibration.vibrate(50);
         }
 
@@ -85,15 +107,15 @@ export default function TodoSticker(
 *  3 - CANCELED
 * */
 
-    function activateTimer() {
-        touchTimer.current =  setTimeout(function () {
+    function activatePanTimer() {
+        panTimer.current =  setTimeout(function () {
             todoState.value = 2;
             setActive(2);
-        }, 750);
+        }, 500);
     }
 
-    function resetTimer() {
-        clearTimeout(touchTimer.current);
+    function resetPanTimer() {
+        clearTimeout(panTimer.current);
     }
 
     function changeStateFromWorker(value) {
@@ -153,8 +175,6 @@ export default function TodoSticker(
         },
         onEnd: (event, context) => {
             todoState.value = 0;
-            console.log("END -> ID: ", noteId);
-            console.log("NEW POSITION:", translateX.value, translateY.value);
             //TODO FAZER UPDATE DE POSICAO DO ELEMENTO AQUI
             isFinished.value = true;
             //repository.updateElement(noteId, translateX.value, translateY.value);
@@ -173,20 +193,23 @@ export default function TodoSticker(
         };
     });
 
+    function editNoteHandler() {
+        editNoteMethod(12)
+    }
 
     return(
-        <PanGestureHandler onGestureEvent={panGestureEvent}>
-            <Animated.View style={[rStyle]}>
-                <View style={styles.todoSticker}>
-                    <View style={styles.todo_title_div}>
-                        <Text style={styles.todo_title_text}>TITLE</Text>
+            <PanGestureHandler onGestureEvent={panGestureEvent}>
+                <Animated.View style={[rStyle]}>
+                    <View style={styles.todoSticker}>
+                        <View style={styles.todo_title_div}>
+                            <Text style={styles.todo_title_text}>TITLE</Text>
+                        </View>
+                        <View style={styles.todo_body_div}>
+                            <Text style={styles.todo_body_text}>This is todo text that I need todo</Text>
+                        </View>
                     </View>
-                    <View style={styles.todo_body_div}>
-                        <Text style={styles.todo_body_text}>This is todo text that I need todo</Text>
-                    </View>
-                </View>
-            </Animated.View>
-        </PanGestureHandler>
+                </Animated.View>
+            </PanGestureHandler>
     )
 }
 

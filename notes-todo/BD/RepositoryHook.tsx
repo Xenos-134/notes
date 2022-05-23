@@ -8,7 +8,6 @@ export function RepositoryHook() {
     const [firstRun, setFirstRun] = useState(true);
 
     useEffect(()=>{
-        //console.log("ADDED NEW ITEM: ", _itemArray);
         if(!_itemArray || _itemArray.length == 0) return;
         AsyncStorage.setItem('@notesList', JSON.stringify(_itemArray));
     },[_itemArray]);
@@ -53,11 +52,10 @@ export function RepositoryHook() {
     async function updateElement(elementId: string, x:number, y:number) {
         //NOTA: ISTO ESTA MUITO MAL FEITO POIS CADA ALTERACAO OBRIGA A CARREGAR TODA A LISTA
 
-        console.log("TRYING TO UPDATE ELEMENT:", elementId);
         /*
         *       Aqui estou na duvida como fazer:
         *   1 - Dar update apenas no AsyncStorage.
-        *   2 - Dar return tanto em async storage como em AsyncStorage
+        *   2 - Dar return tanto aqui como em AsyncStorage
         * */
 
         var itemArrayCopy = await getAllNotes();
@@ -70,15 +68,10 @@ export function RepositoryHook() {
             }
         }
 
-
-
         itemArrayCopy = JSON.stringify(itemArrayCopy);
 
-
         await AsyncStorage.setItem('@notesList', itemArrayCopy);
-
         const newListx = await getAllNotes();
-        console.log("NEW CHANGED POSITION: ",newListx);
     }
 
 
