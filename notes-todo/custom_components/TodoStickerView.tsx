@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {useEffect, useRef, useState} from "react";
-import {PanGestureHandler, PanGestureHandlerGestureEvent, TapGestureHandler} from "react-native-gesture-handler";
+import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 import {RepositoryHook} from "../BD/RepositoryHook";
 
 
@@ -29,6 +29,8 @@ export default function TodoSticker(
         scale,
         noteId,
         editNoteMethod,
+        title,
+        body,
     }) {
     //===========================================================
     //              SHARED VALUES
@@ -100,12 +102,12 @@ export default function TodoSticker(
     }, [active])
 
 
-    /*
-*  0 - NOT ACTIVE
-*  1 - WAITING FOR SECOND PHASE
-*  2 - ACTIVATED
-*  3 - CANCELED
-* */
+   /*
+    *  0 - NOT ACTIVE
+    *  1 - WAITING FOR SECOND PHASE
+    *  2 - ACTIVATED
+    *  3 - CANCELED
+    * */
 
     function activatePanTimer() {
         panTimer.current =  setTimeout(function () {
@@ -202,10 +204,10 @@ export default function TodoSticker(
                 <Animated.View style={[rStyle]}>
                     <View style={styles.todoSticker}>
                         <View style={styles.todo_title_div}>
-                            <Text style={styles.todo_title_text}>TITLE</Text>
+                            <Text style={styles.todo_title_text}>{title}</Text>
                         </View>
                         <View style={styles.todo_body_div}>
-                            <Text style={styles.todo_body_text}>This is todo text that I need todo</Text>
+                            <Text style={styles.todo_body_text}>{body}</Text>
                         </View>
                     </View>
                 </Animated.View>

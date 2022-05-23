@@ -1,4 +1,4 @@
-import {Button, StyleSheet, Text, View} from 'react-native';
+import {Button, LogBox, StyleSheet, Text, View} from 'react-native';
 import Animated, {
     runOnJS,
     useAnimatedGestureHandler,
@@ -38,6 +38,7 @@ export default function MainScreen({navigation}) {
     //===========================================================
     const [notesList, setNotes] = useState([]);
     const [currentFocusPoint, setCurrentFocus] = useState({x:0, y:0});
+    const [firstRender, setFirstRender] = useState(true);
     const repository = RepositoryHook();
 
 
@@ -49,9 +50,10 @@ export default function MainScreen({navigation}) {
     },[])
 
     useEffect(()=>{
-        if (notesList.length == 0) return;
-        transformValueY.value-=1000;
+        if (notesList.length == 0 || !firstRender) return;
+        transformValueY.value-=1500;
         transformValueX.value-=150;
+        setFirstRender(false);
     },[notesList])
 
     async function loadAllNotes() {
@@ -116,13 +118,26 @@ export default function MainScreen({navigation}) {
 
     function editNote(noteId: number) { //TODO PASSAR NoteClass por inteiro para o TodoStickerView e depois devolver aqui
         const targetNote = notesList.find(elm => elm._id == noteId)
-        navigation.navigate("Edit Note", {targetNote});
+        navigation.navigate("Edit Note", {targetNote, saveChangedNote});
     }
 
     //TODO PASSAR ESTE METODO
     function saveChangedNote(changedNote: NoteClass) {
-        console.log("TRYING CHANGE NOTE")
+        console.log("TRYING CHANGE NOTE:\n");
+        const noteListCopy = notesList;
+        for(var i = 0; i < noteListCopy.length; i++) {
+            if(noteListCopy[i]._id === changedNote._id) {
+                noteListCopy[i] = changedNote;
+                break;
+            }
+        }
+
+        console.log("NEW NOTES LIST:\n", noteListCopy);
+        setNotes([...noteListCopy]);
+        repository.updateNotes(noteListCopy);
     }
+
+
 
     return (
         <GestureHandlerRootView style={{ flex: 1}}>
@@ -140,6 +155,8 @@ export default function MainScreen({navigation}) {
                                     scale={scaleValue}
                                     noteId={elm._id}
                                     editNoteMethod={editNote}
+                                    title={elm._title}
+                                    body={elm._body}
                                 />
                             ))
                         }
@@ -179,3 +196,5 @@ const styles = StyleSheet.create({
         bottom: 10
     },
 });
+
+

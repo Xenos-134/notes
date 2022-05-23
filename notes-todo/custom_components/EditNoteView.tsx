@@ -1,15 +1,25 @@
-import {View, Text, StyleSheet, TextInput} from "react-native";
+import {View, Text, StyleSheet, TextInput, Button, LogBox, TouchableHighlight} from "react-native";
 import {useEffect, useState} from "react";
 
-export default function EditNoteView({route, navigation}) {
-    const [title, setTitle] = useState("Lorem Ipsum")
-    const [body, setBody] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam quis gravida purus. Quisque semper venenatis condimentum. Praesent pretium purus lacus, sed volutpat lectus tempus eu. ")
+export default function EditNoteView({route, navigation, saveChangedNote}) {
+    const [title, setTitle] = useState(route.params.targetNote._title);
+    const [body, setBody] = useState(route.params.targetNote._body);
     const [noteColor, setNoteColor] = useState("#fabd2f");
     //TODO ADICIONAR SELECTOR DE CORES
+
 
     useEffect(()=>{
         console.log("RECEIVED TODO", route.params)
     },[])
+
+    function saveNoteChanges() {
+        const noteCoppy = route.params.targetNote;
+        noteCoppy._title = title;
+        noteCoppy._body = body;
+        //console.log("NEW NOTE: \n", noteCoppy);
+        route.params.saveChangedNote(noteCoppy);
+        navigation.goBack();
+    }
 
     return (
         <View style={[styles.edit_note_view, {backgroundColor: noteColor}]}>
@@ -26,6 +36,14 @@ export default function EditNoteView({route, navigation}) {
                     onChangeText={setBody}
                 />
             </View>
+
+            <TouchableHighlight
+                onPress={saveNoteChanges}
+                underlayColor={"#689d6a"}
+                style={styles.save_changes_button}>
+
+                <Text>Save Changes</Text>
+            </TouchableHighlight>
         </View>
     )
 }
@@ -55,5 +73,19 @@ const styles = StyleSheet.create({
         fontSize:17,
         marginTop: "7%",
     },
-
+    save_changes_button: {
+        position: "absolute",
+        alignItems:"center",
+        justifyContent:"center",
+        width: "40%",
+        height: "7%",
+        bottom: "5%",
+        backgroundColor: "#689d6a",
+        alignSelf: "center",
+        borderRadius: 12
+    }
 })
+
+LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+]);

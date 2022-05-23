@@ -3,6 +3,8 @@ import {NoteClass} from "../custom_classes/NoteClass";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+const noteStorageKey = "@notesList";
+
 export function RepositoryHook() {
     const [_itemArray, setItemArray] = useState(new Array<NoteClass>());
     const [firstRun, setFirstRun] = useState(true);
@@ -69,9 +71,12 @@ export function RepositoryHook() {
         }
 
         itemArrayCopy = JSON.stringify(itemArrayCopy);
-
         await AsyncStorage.setItem('@notesList', itemArrayCopy);
         const newListx = await getAllNotes();
+    }
+
+    function updateNotes(noteList: Array<NoteClass>) {
+        AsyncStorage.setItem('@notesList', JSON.stringify(noteList));
     }
 
 
@@ -82,5 +87,6 @@ export function RepositoryHook() {
         getAllNotes,
         loadNotesList,
         updateElement,
+        updateNotes,
     }
 }
