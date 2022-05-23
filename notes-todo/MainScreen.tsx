@@ -48,6 +48,12 @@ export default function MainScreen({navigation}) {
         loadAllNotes();
     },[])
 
+    useEffect(()=>{
+        if (notesList.length == 0) return;
+        transformValueY.value-=1000;
+        transformValueX.value-=150;
+    },[notesList])
+
     async function loadAllNotes() {
         await repository.loadNotesList();
         const notes = await repository.getAllNotes();
@@ -83,7 +89,6 @@ export default function MainScreen({navigation}) {
     //===========================================================
     //              LOCAL METHODS
     //===========================================================
-
     function addNewNote() {
         const noteListCoppy = notesList;
         //console.log(-currentFocusPoint.x, -currentFocusPoint.y);
@@ -92,8 +97,6 @@ export default function MainScreen({navigation}) {
         newNote._x = -currentFocusPoint.x;
         newNote._y = -currentFocusPoint.y;
         repository.add(newNote);
-        //console.log("CREATED NEW ITEM", newNote);
-
 
         const newt = Object.assign({}, newNote);
         newt._x = 0;
@@ -111,11 +114,15 @@ export default function MainScreen({navigation}) {
         scaleValue.value-=0.2;
     }
 
-    function editNote(noteId: number) {
-        console.log("WE ARE TRING TO EDIT NODE", noteId);
-        navigation.navigate("Edit Note");
+    function editNote(noteId: number) { //TODO PASSAR NoteClass por inteiro para o TodoStickerView e depois devolver aqui
+        const targetNote = notesList.find(elm => elm._id == noteId)
+        navigation.navigate("Edit Note", {targetNote});
     }
 
+    //TODO PASSAR ESTE METODO
+    function saveChangedNote(changedNote: NoteClass) {
+        console.log("TRYING CHANGE NOTE")
+    }
 
     return (
         <GestureHandlerRootView style={{ flex: 1}}>
@@ -143,7 +150,6 @@ export default function MainScreen({navigation}) {
                         left:currentFocusPoint.x,
                         backgroundColor:"green", width: 50, height:50
                     }}>
-
                         <Text>ORIGIN</Text>
                     </View>
                     <ScaleUpButton func={scaleUp}/>

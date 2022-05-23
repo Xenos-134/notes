@@ -194,7 +194,7 @@ export default function TodoSticker(
     });
 
     function editNoteHandler() {
-        editNoteMethod(12)
+        editNoteMethod(noteId);
     }
 
     return(
