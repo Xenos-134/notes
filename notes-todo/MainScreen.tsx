@@ -18,6 +18,7 @@ import ScaleUpButton from "./custom_components/Buttons/ScaleUpButton";
 import ScaleDownButton from "./custom_components/Buttons/ScaleDownButton";
 import {NoteClass} from "./custom_classes/NoteClass";
 import {RepositoryHook} from "./BD/RepositoryHook";
+import ShowAllNotesButton from "./custom_components/Buttons/NoteListButton";
 
 type ContextType = {
     translateX: number;
@@ -138,6 +139,10 @@ export default function MainScreen({navigation}) {
     }
 
 
+    function navigateNotesList() {
+        navigation.navigate("Notes List", {notesList, editNote});
+    }
+
 
     return (
         <GestureHandlerRootView style={{ flex: 1}}>
@@ -161,23 +166,16 @@ export default function MainScreen({navigation}) {
                             ))
                         }
                     </View>
-                    <View style={{
-                        position:"absolute",
-                        top:currentFocusPoint.y,
-                        left:currentFocusPoint.x,
-                        backgroundColor:"green", width: 50, height:50
-                    }}>
-                        <Text>ORIGIN</Text>
-                    </View>
                     <ScaleUpButton func={scaleUp}/>
                     <ScaleDownButton func={scaleDown}/>
+                    <ShowAllNotesButton showNotesList={navigateNotesList}/>
                     <NewNoteButton func={addNewNote}/>
                 </Animated.View>
             </PanGestureHandler>
         </GestureHandlerRootView>
     );
 }
-
+//<NewNoteButton func={addNewNote}/>
 
 //TODO FAZER COM QUE A ALTURA FIQUE MAIS ALTERAVEL CONSOANTE QUANTIDADE DE TEXTO
 const styles = StyleSheet.create({
