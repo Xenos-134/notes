@@ -1,4 +1,5 @@
 import {StyleSheet, Text, TouchableHighlight} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function ShowAllNotesButton({showNotesList}) {
     return(
@@ -6,7 +7,7 @@ export default function ShowAllNotesButton({showNotesList}) {
             onPress={showNotesList}
             underlayColor={"#545511"}
             style={styles.show_notes_list_button}>
-            <Text> a </Text>
+            <Icon name="view-list" size={30} color="#282828" />
         </TouchableHighlight>
     )
 }

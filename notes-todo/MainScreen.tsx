@@ -9,6 +9,7 @@ import Animated, {
 } from "react-native-reanimated";
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 import {useEffect, useRef, useState} from "react";
+import { Dimensions } from 'react-native';
 
 
 //CUSTOM COMPONENTS IMPORT
@@ -24,6 +25,8 @@ type ContextType = {
     translateX: number;
     translateY: number;
 };
+
+const SCREEN_DIMENSION = Dimensions.get("window");
 
 export default function MainScreen({navigation}) {
     //===========================================================
@@ -42,6 +45,15 @@ export default function MainScreen({navigation}) {
     const [firstRender, setFirstRender] = useState(true);
     const repository = RepositoryHook();
 
+    //===========================================================
+    //    TRYING FUNCTION TO NAVIGATE TO CERTAIN PLACE
+    //===========================================================
+    function navigateToPosition(x:number, y:number) {
+        transformValueX.value = (x - SCREEN_DIMENSION.width*0.2);
+        transformValueY.value = (y - SCREEN_DIMENSION.height*0.5);
+        console.log("NAVIGATING TO ANOTHER POSITION")
+
+    }
 
     //===========================================================
     //              USE EFFECT SECTION
@@ -50,7 +62,7 @@ export default function MainScreen({navigation}) {
         loadAllNotes();
     },[])
 
-    useEffect(()=>{
+    useEffect(()=>{ //TODO FAZER COM QUE NAVEGAMOS PARA O PRIMEIRO ELEMENTO DA LISTA
         if (notesList.length == 0 || !firstRender) return;
         transformValueY.value-=1500;
         transformValueX.value-=150;
@@ -140,7 +152,7 @@ export default function MainScreen({navigation}) {
 
 
     function navigateNotesList() {
-        navigation.navigate("Notes List", {notesList, editNote});
+        navigation.navigate("Notes List", {notesList, editNote, navigateToPosition});
     }
 
 

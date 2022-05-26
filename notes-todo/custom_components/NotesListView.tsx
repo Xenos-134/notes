@@ -45,6 +45,12 @@ export default function NotesListView({navigation, route}) {
         route.params.editNote(note._id)
     }
 
+    function findNote(note) {
+        route.params.navigateToPosition(note._x, note._y);
+        navigation.goBack();
+
+    }
+
     return (
         <View style={styles.notes_list_main_view}>
             <ScrollView style={{paddingTop: 40, width: "100%"}}>
@@ -55,7 +61,7 @@ export default function NotesListView({navigation, route}) {
                                        a.current[note.title] = ref
                                    }}
 
-                                   renderRightActions={()=>Box(deleteNote, editNote, note)}>
+                                   renderRightActions={()=>Box(deleteNote, editNote, findNote, note)}>
                             <NoteListItem text={note._title}/>
                         </Swipeable>
                     ))
@@ -65,7 +71,7 @@ export default function NotesListView({navigation, route}) {
     )
 }
 
-function Box(deleteMethod, editNote, note) {
+function Box(deleteMethod, editNote, findNote, note) {
     return(
         <View style={styles.side_panel_view}>
             <TouchableHighlight
@@ -75,7 +81,7 @@ function Box(deleteMethod, editNote, note) {
             </TouchableHighlight>
             <TouchableHighlight
                 style={styles.locate_item_view}
-                onPress={()=>console.log("LOCATE")}>
+                onPress={()=>findNote(note)}>
                 <Icon name="find-in-page" size={30} color="#900" />
             </TouchableHighlight>
             <TouchableHighlight
