@@ -5,7 +5,7 @@ export default function ScaleDownButton({func}) {
         <TouchableHighlight
             onPress={func}
             style={styles.scale_button_view}>
-            <Text>-</Text>
+            <Text style={styles.text}>-</Text>
         </TouchableHighlight>
     )
 }
@@ -22,5 +22,10 @@ const styles = StyleSheet.create({
         backgroundColor: "#689d6a",
         elevation: 10,
         borderRadius: 10
+    },
+    text: {
+        color: "#fbf1c7",
+        fontWeight: "500",
+        fontSize: 25
     }
 })

@@ -48,7 +48,8 @@ export function RepositoryHook() {
         //ISTO ESTA REDUNDANTE POIS setState nao e assincron por isso a chamada no inicio ira devolver uma lista vazia
         const loadedNotesList = await AsyncStorage.getItem('@notesList')
         const parsedList = await JSON.parse(loadedNotesList);
-        return parsedList;
+
+        return parsedList!=null?parsedList:[];
     }
 
     async function updateElement(elementId: string, x:number, y:number) {

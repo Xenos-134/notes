@@ -36,17 +36,27 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
                     onChangeText={setBody}
                 />
             </View>
-
+            <ColorSelector/>
             <TouchableHighlight
                 onPress={saveNoteChanges}
                 underlayColor={"#689d6a"}
                 style={styles.save_changes_button}>
-
-                <Text>Save Changes</Text>
+                <Text style={styles.save_changes_button_text}>Save Changes</Text>
             </TouchableHighlight>
         </View>
     )
 }
+
+function ColorSelector() {
+    return (
+        <View>
+            <Text>
+                Select Color For TODO
+            </Text>
+        </View>
+    )
+}
+
 
 const styles = StyleSheet.create({
     edit_note_view: {
@@ -83,7 +93,17 @@ const styles = StyleSheet.create({
         backgroundColor: "#689d6a",
         alignSelf: "center",
         borderRadius: 12
-    }
+    },
+    save_changes_button_text: {
+        color: "#ebdbb2",
+        fontWeight: "600",
+        fontSize: 16,
+    },
+
+    //COLOR SELECTOR PART TODO -> CHANGE TO ANOTHER VIEW 
+
+
+
 })
 
 LogBox.ignoreLogs([

@@ -62,7 +62,7 @@ export default function NotesListView({navigation, route}) {
                                    }}
 
                                    renderRightActions={()=>Box(deleteNote, editNote, findNote, note)}>
-                            <NoteListItem text={note._title}/>
+                            <NoteListItem note={note}/>
                         </Swipeable>
                     ))
                 }

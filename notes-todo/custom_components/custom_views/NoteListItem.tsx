@@ -3,11 +3,14 @@ import {useEffect} from "react";
 
 
 
-export default function NoteListItem({text}) {
+export default function NoteListItem({note}) {
     return(
             <View style={styles.note_list_item_main_view}>
                 <Text style={styles.title_text}>
-                    {text}
+                    {note._title}
+                </Text>
+                <Text style={styles.body_text}>
+                    {note._body}
                 </Text>
             </View>
     )
@@ -26,5 +29,10 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
         fontWeight: "600"
+    },
+    body_text: {
+        marginTop: 10,
+        fontSize: 12,
+        fontWeight: "400"
     }
 })

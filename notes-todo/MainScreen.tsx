@@ -72,6 +72,7 @@ export default function MainScreen({navigation}) {
     async function loadAllNotes() {
         await repository.loadNotesList();
         const notes = await repository.getAllNotes();
+        console.log("NOTES: ", notes);
         setNotes(notes);
     }
 

@@ -7,7 +7,7 @@ export default function ShowAllNotesButton({showNotesList}) {
             onPress={showNotesList}
             underlayColor={"#545511"}
             style={styles.show_notes_list_button}>
-            <Icon name="view-list" size={30} color="#282828" />
+            <Icon name="view-list" size={30} color="#ebdbb2" />
         </TouchableHighlight>
     )
 }
