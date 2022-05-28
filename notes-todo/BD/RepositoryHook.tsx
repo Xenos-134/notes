@@ -9,14 +9,17 @@ export function RepositoryHook() {
     const [_itemArray, setItemArray] = useState(new Array<NoteClass>());
     const [firstRun, setFirstRun] = useState(true);
 
+
     useEffect(()=>{
         if(!_itemArray || _itemArray.length == 0) return;
         AsyncStorage.setItem('@notesList', JSON.stringify(_itemArray));
     },[_itemArray]);
 
+
     useEffect(()=>{
         //resetRepository();
     },[])
+
 
     async function add(item: NoteClass) {
         var exist: boolean = false;
@@ -25,13 +28,11 @@ export function RepositoryHook() {
         setItemArray([..._itemArray, item]);
     };
 
-    function remove() {
-        //TODO
-    };
 
     function get(): NoteClass {
         //TODO
     }
+
 
     async function loadNotesList() {
         const loadedNotesList = await AsyncStorage.getItem('@notesList')
@@ -39,10 +40,12 @@ export function RepositoryHook() {
         setItemArray(parsedList);
     }
 
+
     async function resetRepository() {
         await AsyncStorage.clear();
         AsyncStorage.setItem("@notesList", JSON.stringify([]));
     }
+
 
     async function getAllNotes() {
         //ISTO ESTA REDUNDANTE POIS setState nao e assincron por isso a chamada no inicio ira devolver uma lista vazia
@@ -51,6 +54,7 @@ export function RepositoryHook() {
 
         return parsedList!=null?parsedList:[];
     }
+
 
     async function updateElement(elementId: string, x:number, y:number) {
         //NOTA: ISTO ESTA MUITO MAL FEITO POIS CADA ALTERACAO OBRIGA A CARREGAR TODA A LISTA
@@ -78,6 +82,14 @@ export function RepositoryHook() {
 
     function updateNotes(noteList: Array<NoteClass>) {
         AsyncStorage.setItem('@notesList', JSON.stringify(noteList));
+    }
+
+    async function remove(note: NoteClass) {
+        const notes_list = await getAllNotes();
+        const filtered_list =  notes_list.filter(n => n._id != note._id);
+        console.log("NOTES LIST AFTHER DELETE: ", filtered_list);
+        await AsyncStorage.setItem('@notesList', JSON.stringify(filtered_list));
+        return;
     }
 
 

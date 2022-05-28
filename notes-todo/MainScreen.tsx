@@ -135,7 +135,11 @@ export default function MainScreen({navigation}) {
 
     function editNote(noteId: number) { //TODO PASSAR NoteClass por inteiro para o TodoStickerView e depois devolver aqui
         const targetNote = notesList.find(elm => elm._id == noteId)
-        navigation.navigate("Edit Note", {targetNote, saveChangedNote});
+        navigation.navigate("Edit Note", {
+            targetNote,
+            saveChangedNote,
+            deleteNote,
+        });
     }
 
     //TODO PASSAR ESTE METODO
@@ -156,9 +160,19 @@ export default function MainScreen({navigation}) {
 
 
     function navigateNotesList() {
-        navigation.navigate("Notes List", {notesList, editNote, navigateToPosition});
+        navigation.navigate("Notes List", {
+            notesList,
+            editNote,
+            navigateToPosition,
+        });
     }
 
+
+    function deleteNote(note: NoteClass) {
+        const filtered_notes = notesList.filter(elm => elm._id != note._id);
+        repository.remove(note);
+        setNotes(filtered_notes);
+    }
 
     return (
         <GestureHandlerRootView style={{ flex: 1}}>

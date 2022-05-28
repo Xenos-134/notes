@@ -22,7 +22,6 @@ const styles = StyleSheet.create({
         alignItems:"center",
         width:  "100%",
         height: 150, //TODO ALTERAR ISTO PARA SER ATRAVES DE DIMNENSIONS
-        marginBottom: 20,
         elevation: 10
     },
     title_text: {

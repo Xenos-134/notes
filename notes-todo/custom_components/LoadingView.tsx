@@ -4,11 +4,14 @@ import LottieView from 'lottie-react-native';
 export default function LoadingView() {
     return (
         <View style={styles.loading_main_view}>
-            <LottieView source={require('../animations/notepad_animation.json')} autoPlay loop />
+            <LottieView
+                style={{transform: [{scale: 1.2}]}}
+                source={require('../animations/notepad_animation.json')} autoPlay loop />
         </View>
     )
 }
 
+//                style={{transform: [{scale: 1.3}]}}
 const styles = StyleSheet.create({
     loading_main_view: {
         flex: 1,

@@ -18,8 +18,8 @@ function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{headerShown: false}}>
-                <Stack.Screen name="Loading" component={LoadingView} />
                 <Stack.Screen name="MainScreen" component={MainScreen} />
+                <Stack.Screen name="Loading" component={LoadingView} />
                 <Stack.Screen name="Edit Note" component={EditNoteView} />
                 <Stack.Screen name="Notes List" component={NotesListView} options={{cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,}} />
             </Stack.Navigator>

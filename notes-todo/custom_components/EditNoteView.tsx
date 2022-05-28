@@ -27,6 +27,11 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
         navigation.goBack();
     }
 
+    function deleteNote() {
+        route.params.deleteNote(route.params.targetNote);
+        navigation.goBack();
+    }
+
 
     function changeColor(color: string) {
         setColor(color);
@@ -49,12 +54,21 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
                 />
             </View>
             <ColorSelector changeColorMethod={changeColor} />
-            <TouchableHighlight
-                onPress={saveNoteChanges}
-                underlayColor={"#689d6a"}
-                style={styles.save_changes_button}>
-                <Text style={styles.save_changes_button_text}>Save Changes</Text>
-            </TouchableHighlight>
+            <View style={styles.buttons_view}>
+                <TouchableHighlight
+                    onPress={saveNoteChanges}
+                    underlayColor={"#689d6a"}
+                    style={styles.save_changes_button}>
+                    <Text style={styles.save_changes_button_text}>Save Changes</Text>
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                    onPress={deleteNote}
+                    underlayColor={"#689d6a"}
+                    style={styles.delete_button}>
+                    <Text style={styles.save_changes_button_text}>Delete</Text>
+                </TouchableHighlight>
+            </View>
         </View>
     )
 }
@@ -117,12 +131,10 @@ const styles = StyleSheet.create({
         marginTop: "7%",
     },
     save_changes_button: {
-        position: "absolute",
         alignItems:"center",
         justifyContent:"center",
         width: "40%",
-        height: "7%",
-        bottom: "5%",
+        height: 60,
         backgroundColor: "#689d6a",
         alignSelf: "center",
         borderRadius: 12
@@ -132,11 +144,22 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontSize: 16,
     },
-
-    //COLOR SELECTOR PART TODO -> CHANGE TO ANOTHER VIEW 
-
-
-
+    delete_button: {
+        alignItems:"center",
+        justifyContent:"center",
+        width: "40%",
+        height: 60,
+        backgroundColor: "#fb4934",
+        alignSelf: "center",
+        borderRadius: 12
+    },
+    buttons_view: {
+        width: "100%",
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        position: "absolute",
+        bottom: "3%",
+    }
 })
 
 LogBox.ignoreLogs([
