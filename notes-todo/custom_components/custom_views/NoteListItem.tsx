@@ -5,7 +5,7 @@ import {useEffect} from "react";
 
 export default function NoteListItem({note}) {
     return(
-            <View style={styles.note_list_item_main_view}>
+            <View style={[styles.note_list_item_main_view, {backgroundColor: note._color?note._color:"#fabd2f"}]}>
                 <Text style={styles.title_text}>
                     {note._title}
                 </Text>

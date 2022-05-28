@@ -76,11 +76,14 @@ export default function MainScreen({navigation}) {
         setNotes(notes);
     }
 
-
+    //===========================================================
+    //  !!!(ATENTION) THIS PART CAUSES DELAY
+    //===========================================================
+    /*
     useDerivedValue(() => {
         runOnJS(updateCurrentFocusPosition)(transformValueX.value, transformValueY.value);
     },[transformValueX.value, transformValueY.value]);
-
+*/
     function updateCurrentFocusPosition(newX, newY) {
         setCurrentFocus({x:-newX, y: -newY});
     }
@@ -175,6 +178,7 @@ export default function MainScreen({navigation}) {
                                     editNoteMethod={editNote}
                                     title={elm._title}
                                     body={elm._body}
+                                    color={elm._color?elm._color:"#fabd2f"}
                                 />
                             ))
                         }

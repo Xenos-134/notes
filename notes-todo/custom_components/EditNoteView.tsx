@@ -4,25 +4,37 @@ import {useEffect, useState} from "react";
 export default function EditNoteView({route, navigation, saveChangedNote}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
     const [body, setBody] = useState(route.params.targetNote._body);
+    const [color, setColor] = useState("#fabd2f");
     const [noteColor, setNoteColor] = useState("#fabd2f");
     //TODO ADICIONAR SELECTOR DE CORES
 
 
     useEffect(()=>{
         console.log("RECEIVED TODO", route.params)
+        if(route.params.targetNote._color != null) {
+            setColor(route.params.targetNote._color);
+        }
+
     },[])
 
     function saveNoteChanges() {
         const noteCoppy = route.params.targetNote;
         noteCoppy._title = title;
         noteCoppy._body = body;
-        //console.log("NEW NOTE: \n", noteCoppy);
+        noteCoppy._color = color;
+        console.log("NEW NOTE: \n", noteCoppy);
         route.params.saveChangedNote(noteCoppy);
         navigation.goBack();
     }
 
+
+    function changeColor(color: string) {
+        setColor(color);
+    }
+
+
     return (
-        <View style={[styles.edit_note_view, {backgroundColor: noteColor}]}>
+        <View style={[styles.edit_note_view, {backgroundColor: color}]}>
             <View style={styles.edit_note_text_view}>
                 <TextInput
                     style={styles.edit_note_title_text_input}
@@ -36,7 +48,7 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
                     onChangeText={setBody}
                 />
             </View>
-            <ColorSelector/>
+            <ColorSelector changeColorMethod={changeColor} />
             <TouchableHighlight
                 onPress={saveNoteChanges}
                 underlayColor={"#689d6a"}
@@ -47,18 +59,39 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
     )
 }
 
-function ColorSelector() {
+function ColorSelector({changeColorMethod}) {
+    const defaultColors = ["#fabd2f", "#83a598", "#d3869b", "#8ec07c"]
+
     return (
-        <View>
-            <Text>
-                Select Color For TODO
-            </Text>
+        <View style={styles.color_selector_main_view}>
+            {
+                defaultColors.map( color =>
+                    <TouchableHighlight
+                         style={{marginRight: 10}}
+                        onPress={()=> changeColorMethod(color)}
+                    >
+                        <View
+                            style={[styles.color_selector_view, {backgroundColor: color}]}/>
+                    </TouchableHighlight>
+                )
+            }
         </View>
     )
 }
 
 
 const styles = StyleSheet.create({
+    color_selector_main_view: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        paddingHorizontal: 20,
+    },
+    color_selector_view: {
+        width: 50,
+        height: 50,
+        backgroundColor: "blue",
+        borderWidth: 3,
+    },
     edit_note_view: {
         flex: 1,
         justifyContent:"flex-start",

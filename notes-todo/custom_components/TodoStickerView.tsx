@@ -31,6 +31,7 @@ export default function TodoSticker(
         editNoteMethod,
         title,
         body,
+        color
     }) {
     //===========================================================
     //              SHARED VALUES
@@ -202,7 +203,7 @@ export default function TodoSticker(
     return(
             <PanGestureHandler onGestureEvent={panGestureEvent}>
                 <Animated.View style={[rStyle]}>
-                    <View style={styles.todoSticker}>
+                    <View style={[styles.todoSticker, {backgroundColor: color}]}>
                         <View style={styles.todo_title_div}>
                             <Text style={styles.todo_title_text}>{title}</Text>
                         </View>
