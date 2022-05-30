@@ -20,6 +20,8 @@ import ScaleDownButton from "./custom_components/Buttons/ScaleDownButton";
 import {NoteClass} from "./custom_classes/NoteClass";
 import {RepositoryHook} from "./BD/RepositoryHook";
 import ShowAllNotesButton from "./custom_components/Buttons/NoteListButton";
+import {CategoryClass} from "./custom_classes/CategoryClass";
+import NoteClassView from "./custom_components/NoteClassView";
 
 type ContextType = {
     translateX: number;
@@ -28,7 +30,43 @@ type ContextType = {
 
 const SCREEN_DIMENSION = Dimensions.get("window");
 
+// @ts-ignore
 export default function MainScreen({navigation}) {
+    //===========================================================
+    //             TESTING NOTES CATEGORY
+    //===========================================================
+    const [categories, setCategories] = useState([]);
+
+    useEffect(()=>{
+
+        repository.loadCategories();
+
+        const category1 = createNewCategory("Test Category 1");
+        category1.setPosition(100, -350);
+        pushCategory(category1);
+
+    },[])
+
+    function createNewCategory(name: string) {
+        const category = new CategoryClass(name);
+        console.log("Category", category);
+        return category;
+    }
+
+    function pushCategory(category : CategoryClass) {
+        setCategories( categories => [...categories, category]);
+    }
+
+    function loadCategoriesFromRepository() {
+        //TODO
+    }
+
+    useEffect(()=>{
+        console.log(">>>",categories);
+    },[categories])
+
+
+
     //===========================================================
     //              SHARED VALUES
     //===========================================================
@@ -52,7 +90,6 @@ export default function MainScreen({navigation}) {
         transformValueX.value = (x - SCREEN_DIMENSION.width*0.2);
         transformValueY.value = (y - SCREEN_DIMENSION.height*0.5);
         console.log("NAVIGATING TO ANOTHER POSITION")
-
     }
 
     //===========================================================
@@ -72,7 +109,7 @@ export default function MainScreen({navigation}) {
     async function loadAllNotes() {
         await repository.loadNotesList();
         const notes = await repository.getAllNotes();
-        console.log("NOTES: ", notes);
+        //console.log("NOTES: ", notes);
         setNotes(notes);
     }
 
@@ -144,7 +181,7 @@ export default function MainScreen({navigation}) {
 
     //TODO PASSAR ESTE METODO
     function saveChangedNote(changedNote: NoteClass) {
-        console.log("TRYING CHANGE NOTE:\n");
+        //console.log("TRYING CHANGE NOTE:\n");
         const noteListCopy = notesList;
         for(var i = 0; i < noteListCopy.length; i++) {
             if(noteListCopy[i]._id === changedNote._id) {
@@ -153,7 +190,7 @@ export default function MainScreen({navigation}) {
             }
         }
 
-        console.log("NEW NOTES LIST:\n", noteListCopy);
+        //console.log("NEW NOTES LIST:\n", noteListCopy);
         setNotes([...noteListCopy]);
         repository.updateNotes(noteListCopy);
     }
@@ -179,6 +216,19 @@ export default function MainScreen({navigation}) {
             <PanGestureHandler onGestureEvent={panGestureEvent}>
                 <Animated.View style={styles.animated_view}>
                     <View style={styles.container}>
+                        {/* CATEGORIES LIST*/}
+                        {
+                            categories.map(category => (
+                                <NoteClassView
+                                    key={category.name}
+                                    referentialX={transformValueX}
+                                    referentialY={transformValueY}
+                                    scale={scaleValue}
+                                    category={category}
+                                />
+                            ))
+                        }
+                        {/* NOTES LIST*/}
                         {
                             notesList.map(elm => (
                                 <TodoSticker
@@ -197,6 +247,7 @@ export default function MainScreen({navigation}) {
                             ))
                         }
                     </View>
+
                     <ScaleUpButton func={scaleUp}/>
                     <ScaleDownButton func={scaleDown}/>
                     <ShowAllNotesButton showNotesList={navigateNotesList}/>
@@ -226,4 +277,6 @@ const styles = StyleSheet.create({
     },
 });
 
-
+LogBox.ignoreLogs([
+    'ViewPropTypes will be removed from React Native. Migrate to ViewPropTypes exported from \'deprecated-react-native-prop-types\'.',
+]);

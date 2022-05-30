@@ -2,6 +2,8 @@ import {StyleSheet, Text, TouchableHighlight} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function ShowAllNotesButton({showNotesList}) {
+
+
     return(
         <TouchableHighlight
             onPress={showNotesList}

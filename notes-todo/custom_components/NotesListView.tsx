@@ -53,7 +53,15 @@ export default function NotesListView({navigation, route}) {
 
     return (
         <View style={styles.notes_list_main_view}>
-            <ScrollView style={{paddingTop: 40, width: "100%"}}>
+            <ScrollView
+                style={{paddingTop: 40, width: "100%"}}
+                
+            >
+                <View style={styles.notes_list_header_view}>
+                    <Text style={styles.notes_list_header_text}>
+                        Notes
+                    </Text>
+                </View>
                 {
                     n.map(note => (
                         <Swipeable id={note._id}
@@ -126,5 +134,15 @@ const styles = StyleSheet.create({
         height: 50,
         alignItems:"center",
         justifyContent:"center",
+    },
+    notes_list_header_view: {
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 20
+    },
+    notes_list_header_text: {
+        fontSize: 25,
+        fontWeight: "600",
+        color: "#282828",
     }
 })

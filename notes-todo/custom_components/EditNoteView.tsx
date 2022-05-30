@@ -1,5 +1,7 @@
 import {View, Text, StyleSheet, TextInput, Button, LogBox, TouchableHighlight} from "react-native";
 import {useEffect, useState} from "react";
+import CategoryBadge from "./badges/CategoryBadge";
+import AddBadge from "./badges/AddBadge";
 
 export default function EditNoteView({route, navigation, saveChangedNote}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
@@ -52,6 +54,10 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
                     value={body}
                     onChangeText={setBody}
                 />
+                <View style={styles.badges_view}>
+                    <CategoryBadge text={"Test Bage"}/>
+                    <AddBadge/>
+                </View>
             </View>
             <ColorSelector changeColorMethod={changeColor} />
             <View style={styles.buttons_view}>
@@ -99,6 +105,8 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "flex-start",
         paddingHorizontal: 20,
+        position: "absolute",
+        bottom: 120,
     },
     color_selector_view: {
         width: 50,
@@ -129,6 +137,7 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontSize:17,
         marginTop: "7%",
+        marginBottom: "7%"
     },
     save_changes_button: {
         alignItems:"center",
@@ -137,7 +146,8 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: "#689d6a",
         alignSelf: "center",
-        borderRadius: 12
+        borderRadius: 12,
+        elevation: 10
     },
     save_changes_button_text: {
         color: "#ebdbb2",
@@ -151,7 +161,8 @@ const styles = StyleSheet.create({
         height: 60,
         backgroundColor: "#fb4934",
         alignSelf: "center",
-        borderRadius: 12
+        borderRadius: 12,
+        elevation: 10
     },
     buttons_view: {
         width: "100%",
@@ -159,6 +170,9 @@ const styles = StyleSheet.create({
         justifyContent: "space-evenly",
         position: "absolute",
         bottom: "3%",
+    },
+    badges_view: {
+        flexDirection: "row",
     }
 })
 
