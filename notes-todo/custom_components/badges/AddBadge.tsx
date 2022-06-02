@@ -1,9 +1,11 @@
-import {StyleSheet, View} from "react-native";
+import {StyleSheet, TouchableHighlight, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-export default function AddBadge() {
+export default function AddBadge({openCategoryList}) {
     return (
-        <View style={
+        <TouchableHighlight
+            onPress={openCategoryList}
+            style={
             {
                 backgroundColor: "#ebdbb2",
                 height: 40,
@@ -16,7 +18,7 @@ export default function AddBadge() {
             }
         }>
             <Icon name="add" size={25} color="#282828" />
-        </View>
+        </TouchableHighlight>
     )
 }
 

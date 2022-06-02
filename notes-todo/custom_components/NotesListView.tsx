@@ -1,5 +1,5 @@
 import {Text, View, StyleSheet, ScrollView, TouchableHighlight, Button} from "react-native";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 
@@ -14,12 +14,25 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {Swipeable} from "react-native-gesture-handler";
+import NewCategoryFormView from "./forms/NewCategoryForm";
+import {RepositoryHook} from "../BD/RepositoryHook";
+import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 
 export default function NotesListView({navigation, route}) {
+    //===========================================================
+    //            States Declaration
+    //===========================================================
     const [n, setN] = useState([]);
     const [deletedElement, setDeletedElement] = useState(null)
-
+    const [visibleNewCategory, setVisibleNewCategory] = useState(false);
     const a = useRef([]);
+
+
+    //===========================================================
+    //            Custom Hooks and Context
+    //===========================================================
+    const repository = RepositoryHook();
+    const categoryContext = useContext(CategorySharedContext);
 
     useEffect(()=>{
         console.log("RECEIVED PARAMS:\n", route.params.notesList);
@@ -51,26 +64,48 @@ export default function NotesListView({navigation, route}) {
 
     }
 
+    function showNewCategotryForm() {
+        setVisibleNewCategory(true);
+    }
+
+    function hideCategotryForm() {
+        setVisibleNewCategory(false);
+    }
+
+    function createNewCategory(categoryName) {
+        console.log("CREATINGNEW CATEGORY:", categoryName);
+        //repository.addNewCategory(categoryName);
+        categoryContext.addCategory(categoryName);
+        hideCategotryForm();
+    }
+
     return (
         <View style={styles.notes_list_main_view}>
+            {
+                visibleNewCategory && <NewCategoryFormView
+                    createNewCategory={createNewCategory}/>
+            }
             <ScrollView
-                style={{paddingTop: 40, width: "100%"}}
-                
-            >
+                style={{paddingTop: 40, width: "100%"}}>
                 <View style={styles.notes_list_header_view}>
                     <Text style={styles.notes_list_header_text}>
                         Notes
                     </Text>
+                    <Button title={"NEW CATEGORY"}
+                        onPress={showNewCategotryForm}
+                    />
                 </View>
                 {
                     n.map(note => (
-                        <Swipeable id={note._id}
+                        <Swipeable key={note._id}
                                    ref = {ref => {
                                        a.current[note.title] = ref
                                    }}
 
                                    renderRightActions={()=>Box(deleteNote, editNote, findNote, note)}>
-                            <NoteListItem note={note}/>
+                            <NoteListItem
+                                key={note._id}
+                                note={note}/>
                         </Swipeable>
                     ))
                 }
@@ -138,7 +173,8 @@ const styles = StyleSheet.create({
     notes_list_header_view: {
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 20
+        marginBottom: 20,
+        flexDirection: "row"
     },
     notes_list_header_text: {
         fontSize: 25,

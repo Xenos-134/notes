@@ -1,18 +1,27 @@
 import {View, Text, StyleSheet, TextInput, Button, LogBox, TouchableHighlight} from "react-native";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import CategoryBadge from "./badges/CategoryBadge";
 import AddBadge from "./badges/AddBadge";
+import BadgeListView from "./badges/BadgeListView";
+import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 
-export default function EditNoteView({route, navigation, saveChangedNote}) {
+export default function EditNoteView({route, navigation}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
     const [body, setBody] = useState(route.params.targetNote._body);
     const [color, setColor] = useState("#fabd2f");
-    const [noteColor, setNoteColor] = useState("#fabd2f");
-    //TODO ADICIONAR SELECTOR DE CORES
+    const [openCategorySelector, setOCS] = useState(false);
+
+    //TODO ADICIONAR SELECTOR DE CORES RADIAL
+    //===========================================================
+    //            CONTEXTS
+    //===========================================================
+    const categoryContext = useContext(CategorySharedContext);
 
 
     useEffect(()=>{
-        console.log("RECEIVED TODO", route.params)
+        console.log("RECEIVED TODO", route.params.loadedCategories)
+
+
         if(route.params.targetNote._color != null) {
             setColor(route.params.targetNote._color);
         }
@@ -39,6 +48,13 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
         setColor(color);
     }
 
+    function addCategory() {
+        route.params.addNoteToCategory(route.params.targetNote);
+    }
+
+    function openCategoryList() {
+        setOCS(!openCategorySelector);
+    }
 
     return (
         <View style={[styles.edit_note_view, {backgroundColor: color}]}>
@@ -56,8 +72,13 @@ export default function EditNoteView({route, navigation, saveChangedNote}) {
                 />
                 <View style={styles.badges_view}>
                     <CategoryBadge text={"Test Bage"}/>
-                    <AddBadge/>
+                    <AddBadge openCategoryList={openCategoryList}/>
                 </View>
+                {
+                    openCategorySelector && <BadgeListView
+                        note={route.params.targetNote}
+                        categoriesList={categoryContext.categoryList}/>
+                }
             </View>
             <ColorSelector changeColorMethod={changeColor} />
             <View style={styles.buttons_view}>
@@ -112,7 +133,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         backgroundColor: "blue",
-        borderWidth: 3,
+        borderWidth: 2,
     },
     edit_note_view: {
         flex: 1,

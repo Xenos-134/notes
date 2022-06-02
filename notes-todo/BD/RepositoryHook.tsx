@@ -9,26 +9,30 @@ const CATEGORY_KEYS = "@categoriesKeysList";
 
 
 export function RepositoryHook() {
-    const [_itemArray, setItemArray] = useState(new Array<NoteClass>());
     const [firstRun, setFirstRun] = useState(true);
 
 
-    useEffect(()=>{
-        if(!_itemArray || _itemArray.length == 0) return;
-        AsyncStorage.setItem('@notesList', JSON.stringify(_itemArray));
-    },[_itemArray]);
 
 
     useEffect(()=>{
-        //resetRepository();
+        //AsyncStorage.clear();
     },[])
 
 
     async function add(item: NoteClass) {
-        var exist: boolean = false;
-        exist = _itemArray.some(elm => elm._id === item._id);
-        if(exist) return;
-        setItemArray([..._itemArray, item]);
+        const loadedNotes = await getAllNotes();
+        console.log(loadedNotes)
+        if(loadedNotes == null || loadedNotes.length == 0) {
+            //setItemArray([item]);
+            await AsyncStorage.setItem(noteStorageKey, JSON.stringify([item]));
+            console.log("XXX")
+
+            return;
+        }
+        const parsedList = await JSON.parse(loadedNotes);
+        parsedList.push(item);
+        AsyncStorage.setItem(noteStorageKey, JSON.stringify(parsedList));
+        console.log("SUCESS")
     };
 
 
@@ -38,9 +42,8 @@ export function RepositoryHook() {
 
 
     async function loadNotesList() {
-        const loadedNotesList = await AsyncStorage.getItem('@notesList')
+        const loadedNotesList = await AsyncStorage.getItem(noteStorageKey)
         const parsedList = await JSON.parse(loadedNotesList);
-        setItemArray(parsedList);
     }
 
 
@@ -98,29 +101,53 @@ export function RepositoryHook() {
     //===========================================================
     //             TESTING NOTES CATEGORY (START)
     //===========================================================
-    function addNewCategory(name) {
+    async function addNewCategory(name:string) : Promise<CategoryClass> {
+        console.log("ADDING NEW CATEGORY: ",name);
         const newCategory = new CategoryClass(name);
-
+        const keys = await getCategoryKeys();
+        if(keys.includes(name)) {
+            console.log("ERROR: CANNOT ADD CATEGORY, ALREADY EXIST");
+            return; //THROW ERROR HERE
+        }
+        await addCategoryKey(name);
+        console.log("!!!")
+        AsyncStorage.setItem(name, JSON.stringify(newCategory));
+        return newCategory;
     }
 
     function getSavedCategories() {
         //TODO
     }
 
-    function addNoteToCategory(note: NoteClass) {
-        //TODO
+    async function addNoteToCategory(note: NoteClass ,category: CategoryClass) {
+        const loadedCategory = await getCategory(category._name);
+        loadedCategory.notesList.push(note._id);
+        console.log("ADDING NOTE TO CATEGORY: ", loadedCategory, note._title);
+        AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory));
     }
 
     function removeNoteFromCategory(note: NoteClass) {
         //TODO
     }
 
+    async function getCategory(key:string) {
+        const loadedKeys = await getCategoryKeys();
+        if(!loadedKeys.includes(key)) return;
+        const loadedCategory = await AsyncStorage.getItem(key);
+        const parsedCategory = await JSON.parse(loadedCategory);
+        console.log(">>>>>>>",parsedCategory)
+        return parsedCategory
+    }
+
     async function addCategoryKey(key: string) {
-        const keys = getCategoryKeys();
-        const parsedKeysList = JSON.parse(key);
-        if(parsedKeysList.include(key)) return; //THROW ERROR HERE PROB
-        parsedKeysList.push(key);
-        await AsyncStorage.setItem(CATEGORY_KEYS, JSON.stringify(parsedKeysList));
+        console.log("ADDING KEY");
+        const keys = await getCategoryKeys();
+        if(keys.includes(key)) {
+            console.log("ESTA KEY JA EXISTE");
+            return; //THROW ERROR HERE PROB
+        }
+        keys.push(key);
+        await AsyncStorage.setItem(CATEGORY_KEYS, JSON.stringify(keys));
     }
 
     async function deleteCategoryKey() {
@@ -161,6 +188,8 @@ export function RepositoryHook() {
         loadNotesList,
         updateElement,
         updateNotes,
+        addNewCategory,
+        addNoteToCategory,
         loadCategories,
     }
 }

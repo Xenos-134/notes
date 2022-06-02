@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import { Dimensions } from 'react-native';
 
 
@@ -36,12 +36,14 @@ export default function MainScreen({navigation}) {
     //             TESTING NOTES CATEGORY
     //===========================================================
     const [categories, setCategories] = useState([]);
+    const [loadedCategories, setLoadedCategories] = useState([]);
+
 
     useEffect(()=>{
-
-        repository.loadCategories();
-
+        console.log("CREATING NEW CATEGORY")
         const category1 = createNewCategory("Test Category 1");
+        loadCategoriesFromRepository();
+        //repository.addNewCategory("Test Category 1");
         category1.setPosition(100, -350);
         pushCategory(category1);
 
@@ -49,7 +51,7 @@ export default function MainScreen({navigation}) {
 
     function createNewCategory(name: string) {
         const category = new CategoryClass(name);
-        console.log("Category", category);
+        //console.log("Category", category);
         return category;
     }
 
@@ -57,8 +59,11 @@ export default function MainScreen({navigation}) {
         setCategories( categories => [...categories, category]);
     }
 
-    function loadCategoriesFromRepository() {
-        //TODO
+    async function loadCategoriesFromRepository() {
+        const loaded_categories =  await repository.loadCategories();
+        console.log("LOADED CATEGORIES", loadedCategories);
+        // @ts-ignore
+        setLoadedCategories(loaded_categories);
     }
 
     useEffect(()=>{
@@ -66,6 +71,9 @@ export default function MainScreen({navigation}) {
     },[categories])
 
 
+    function addNoteToCategory(note : NoteClass) {
+        console.log("ADDING NOTE TO CATEGORY", note._title);
+    }
 
     //===========================================================
     //              SHARED VALUES
@@ -107,9 +115,7 @@ export default function MainScreen({navigation}) {
     },[notesList])
 
     async function loadAllNotes() {
-        await repository.loadNotesList();
         const notes = await repository.getAllNotes();
-        //console.log("NOTES: ", notes);
         setNotes(notes);
     }
 
@@ -147,7 +153,6 @@ export default function MainScreen({navigation}) {
     //===========================================================
     function addNewNote() {
         const noteListCoppy = notesList;
-        //console.log(-currentFocusPoint.x, -currentFocusPoint.y);
         const newNote = new NoteClass("TEST TITLE", "LOREM IPSUM BODY");
 
         newNote._x = -currentFocusPoint.x;
@@ -157,7 +162,6 @@ export default function MainScreen({navigation}) {
         const newt = Object.assign({}, newNote);
         newt._x = 0;
         newt._y = 0;
-        //console.log(newt);
         noteListCoppy.push(newt);
         setNotes([...noteListCoppy]);
     }
@@ -174,8 +178,10 @@ export default function MainScreen({navigation}) {
         const targetNote = notesList.find(elm => elm._id == noteId)
         navigation.navigate("Edit Note", {
             targetNote,
+            loadedCategories,
             saveChangedNote,
             deleteNote,
+            addNoteToCategory,
         });
     }
 
