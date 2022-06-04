@@ -57,7 +57,6 @@ export function RepositoryHook() {
         //ISTO ESTA REDUNDANTE POIS setState nao e assincron por isso a chamada no inicio ira devolver uma lista vazia
         const loadedNotesList = await AsyncStorage.getItem('@notesList')
         const parsedList = await JSON.parse(loadedNotesList);
-
         return parsedList!=null?parsedList:[];
     }
 
@@ -115,9 +114,6 @@ export function RepositoryHook() {
         return newCategory;
     }
 
-    function getSavedCategories() {
-        //TODO
-    }
 
     async function addNoteToCategory(note: NoteClass ,category: CategoryClass) {
         const loadedCategory = await getCategory(category._name);
@@ -128,6 +124,12 @@ export function RepositoryHook() {
 
     function removeNoteFromCategory(note: NoteClass) {
         //TODO
+    }
+
+    async function changeCategoryPosition(category : CategoryClass) {
+        console.log("CHANGING POSITION", category);
+        AsyncStorage.setItem(category._name, JSON.stringify(category));
+
     }
 
     async function getCategory(key:string) {
@@ -191,5 +193,6 @@ export function RepositoryHook() {
         addNewCategory,
         addNoteToCategory,
         loadCategories,
+        changeCategoryPosition
     }
 }

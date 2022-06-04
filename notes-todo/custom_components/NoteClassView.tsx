@@ -19,10 +19,10 @@ export default function NoteClassView(
         return {
             transform: [
                 {
-                    translateX: scale.value * (category.position.x - referentialX.value),
+                    translateX: scale.value * (category.x - referentialX.value),
                 },
                 {
-                    translateY: scale.value * (category.position.y - referentialY.value),
+                    translateY: scale.value * (category.y - referentialY.value),
                 },
                 {scale: scale.value * 1.8}
             ],
@@ -33,7 +33,7 @@ export default function NoteClassView(
             <Animated.View style={rStyle}>
                 <View style={styles.note_category_view}>
                     <Text style={styles.note_category_text}>
-                        {category.name}
+                        {category._name}
                     </Text>
                 </View>
             </Animated.View>

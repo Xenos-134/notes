@@ -4,12 +4,14 @@ export class CategoryClass {
     private _name : string;
     private notesList : Array<string>; //Lista de ID de notes que lhe pertencem
     private _color: string;
-    private _x: number;
-    private _y: number;
+    x: number;
+    y: number;
 
     constructor(categoryName: string) {
         this._name = categoryName;
         this.notesList = [];
+        this.x = 0;
+        this.y = 0;
     }
 
     get name() : string {
@@ -25,12 +27,12 @@ export class CategoryClass {
     }
 
     get position() {
-        return {x: this._x, y: this._y};
+        return {x: this.x, y: this.y};
     }
 
     setPosition(x: number, y:number) {
-        this._x = x;
-        this._y = y;
+        this.x = x;
+        this.y = y;
         return this;
     }
 }

@@ -224,9 +224,9 @@ export default function MainScreen({navigation}) {
                     <View style={styles.container}>
                         {/* CATEGORIES LIST*/}
                         {
-                            categories.map(category => (
+                            loadedCategories.map(category => (
                                 <NoteClassView
-                                    key={category.name}
+                                    key={category._name}
                                     referentialX={transformValueX}
                                     referentialY={transformValueY}
                                     scale={scaleValue}

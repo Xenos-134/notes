@@ -53,6 +53,7 @@ export default function EditNoteView({route, navigation}) {
     }
 
     function openCategoryList() {
+        categoryContext.calculateNewPosition(route.params.targetNote);
         setOCS(!openCategorySelector);
     }
 
