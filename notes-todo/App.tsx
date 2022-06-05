@@ -60,29 +60,32 @@ function App() {
         const loadedCategories = await repository.loadCategories();
         const targetCategories = loadedCategories.filter(elm => elm.notesList.includes(note._id));
 
-        targetCategories.forEach(elm => {
-            var sumX = 0;
-            var sumY = 0;
-            var numOfElm = 0;
-            elm.notesList.forEach( n => {
-                const fn = notes.find(tn => tn._id == n);
-                sumX+= fn._x;
-                sumY+= fn._y;
-                numOfElm+=1;
-                console.log("TARGET", fn);
+        Promise.all(
+            targetCategories.map( async elm=> {
+                var sumX = 0;
+                var sumY = 0;
+                var numOfElm = 0;
+                elm.notesList.forEach( n => {
+                    const fn = notes.find(tn => tn._id == n);
+                    sumX+= fn._x;
+                    sumY+= fn._y;
+                    numOfElm+=1;
+                })
+                elm.x = sumX/numOfElm;
+                elm.y = sumY/numOfElm;
+                await repository.changeCategoryPosition(elm);
+                console.log("-------------------------------------")
             })
-            elm.x = sumX/numOfElm - 100;
-            elm.y = sumY/numOfElm - 100;
-            repository.changeCategoryPosition(elm);
-        })
+        )
+
+        const categoriesList = await repository.loadCategories();
+        return categoriesList;
     }
 
 
     //===========================================================
     //             INITIALIZATION OF CONTEXT (END)
     //===========================================================
-
-
     useEffect(()=>{
         if(categoriesLoaded) return;
         noteCategoryContext.loadCategoriesFromRepository();

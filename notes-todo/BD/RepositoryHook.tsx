@@ -127,9 +127,8 @@ export function RepositoryHook() {
     }
 
     async function changeCategoryPosition(category : CategoryClass) {
-        console.log("CHANGING POSITION", category);
-        AsyncStorage.setItem(category._name, JSON.stringify(category));
-
+        await AsyncStorage.setItem(category._name, JSON.stringify(category));
+        return;
     }
 
     async function getCategory(key:string) {

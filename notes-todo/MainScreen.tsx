@@ -22,6 +22,7 @@ import {RepositoryHook} from "./BD/RepositoryHook";
 import ShowAllNotesButton from "./custom_components/Buttons/NoteListButton";
 import {CategoryClass} from "./custom_classes/CategoryClass";
 import NoteClassView from "./custom_components/NoteClassView";
+import {CategorySharedContext} from "./shared_contexts/CategorySharedContext";
 
 type ContextType = {
     translateX: number;
@@ -37,6 +38,7 @@ export default function MainScreen({navigation}) {
     //===========================================================
     const [categories, setCategories] = useState([]);
     const [loadedCategories, setLoadedCategories] = useState([]);
+    const categoryContext = useContext(CategorySharedContext);
 
 
     useEffect(()=>{
@@ -217,6 +219,15 @@ export default function MainScreen({navigation}) {
         setNotes(filtered_notes);
     }
 
+    async function reaclculateNotesView(note : NoteClass) {
+        setTimeout(async function () {
+            const loadedCategories = await categoryContext.calculateNewPosition(note);
+            console.log("REACLCUALTING POSITIONXXXXXXXXXXXXXXXXXXXXXXXXXXXXX WAIT ED 5 SEC");
+            setLoadedCategories(loadedCategories);
+        }, 500);
+
+    }
+
     return (
         <GestureHandlerRootView style={{ flex: 1}}>
             <PanGestureHandler onGestureEvent={panGestureEvent}>
@@ -249,6 +260,8 @@ export default function MainScreen({navigation}) {
                                     title={elm._title}
                                     body={elm._body}
                                     color={elm._color?elm._color:"#fabd2f"}
+                                    note={elm}
+                                    reaclculateNotesView={reaclculateNotesView}
                                 />
                             ))
                         }

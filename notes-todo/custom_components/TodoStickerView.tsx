@@ -7,9 +7,10 @@ import Animated, {
     withRepeat,
     withTiming
 } from "react-native-reanimated";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 import {RepositoryHook} from "../BD/RepositoryHook";
+import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 
 
 type ContextType = {
@@ -31,7 +32,9 @@ export default function TodoSticker(
         editNoteMethod,
         title,
         body,
-        color
+        color,
+        note,
+        reaclculateNotesView
     }) {
     //===========================================================
     //              SHARED VALUES
@@ -88,6 +91,7 @@ export default function TodoSticker(
         if(active == 3) {   //Cancel
             resetPanTimer();
             setCurrentTapTime(Date.now());
+            reaclculateNotesView(note);
             return;
         }
 
