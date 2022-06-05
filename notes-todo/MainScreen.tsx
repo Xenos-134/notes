@@ -224,7 +224,7 @@ export default function MainScreen({navigation}) {
             const loadedCategories = await categoryContext.calculateNewPosition(note);
             console.log("REACLCUALTING POSITIONXXXXXXXXXXXXXXXXXXXXXXXXXXXXX WAIT ED 5 SEC");
             setLoadedCategories(loadedCategories);
-        }, 500);
+        }, 200);
 
     }
 

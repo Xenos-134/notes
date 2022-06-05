@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {View, Text, Button} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { CardStyleInterpolators } from '@react-navigation/stack';
+import {useContext, useEffect, useState} from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import {CardStyleInterpolators, createStackNavigator} from '@react-navigation/stack';
 
 
 //CUSTOM COMPONENTS IMPORTS
@@ -10,7 +9,6 @@ import MainScreen from "./MainScreen";
 import EditNoteView from "./custom_components/EditNoteView";
 import NotesListView from "./custom_components/NotesListView";
 import LoadingView from "./custom_components/LoadingView";
-import {useContext, useEffect, useState} from "react";
 import {CategorySharedContext} from "./shared_contexts/CategorySharedContext";
 import {CategoryClass} from "./custom_classes/CategoryClass";
 import {RepositoryHook} from "./BD/RepositoryHook";
@@ -58,28 +56,45 @@ function App() {
         const notes = await repository.getAllNotes();
 
         const loadedCategories = await repository.loadCategories();
+        if (loadedCategories && loadedCategories.length == 0) return []
         const targetCategories = loadedCategories.filter(elm => elm.notesList.includes(note._id));
+
+
 
         Promise.all(
             targetCategories.map( async elm=> {
-                var sumX = 0;
-                var sumY = 0;
-                var numOfElm = 0;
+                var leftTopCorner = {x: Infinity, y: Infinity};
+                var rightBottomCorner = {x: -Infinity, y: Infinity};
+
+
+                console.log("TARGET: ", elm._name)
                 elm.notesList.forEach( n => {
                     const fn = notes.find(tn => tn._id == n);
-                    sumX+= fn._x;
-                    sumY+= fn._y;
-                    numOfElm+=1;
+                    elm.x = fn._x;
+                    elm.y = fn._y;
+
+                    if(fn._x < leftTopCorner.x) {
+                        leftTopCorner.x = fn._x;
+                    }
+
+                    if(fn._y < leftTopCorner.y) {
+                        leftTopCorner.y = fn._y;
+                    }
+                    if(fn._x > rightBottomCorner.x) {
+                        rightBottomCorner.x = fn._x;
+                    }
+                    if(fn._y > rightBottomCorner.y) {
+                        rightBottomCorner.y = fn._y;
+                    }
+
                 })
-                elm.x = sumX/numOfElm;
-                elm.y = sumY/numOfElm;
+                elm.x = leftTopCorner.x;
+                elm.y = leftTopCorner.y;
                 await repository.changeCategoryPosition(elm);
-                console.log("-------------------------------------")
             })
         )
 
-        const categoriesList = await repository.loadCategories();
-        return categoriesList;
+        return await repository.loadCategories();
     }
 
 
