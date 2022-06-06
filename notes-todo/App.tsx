@@ -13,6 +13,7 @@ import {CategorySharedContext} from "./shared_contexts/CategorySharedContext";
 import {CategoryClass} from "./custom_classes/CategoryClass";
 import {RepositoryHook} from "./BD/RepositoryHook";
 import {NoteClass} from "./custom_classes/NoteClass";
+import {NoteSharedContext} from "./shared_contexts/NotesSharedContext";
 
 
 const Stack = createStackNavigator();
@@ -25,12 +26,12 @@ function App() {
     //===========================================================
     const repository = RepositoryHook();
 
+    const noteContext = useContext(NoteSharedContext);
     const noteCategoryContext = useContext(CategorySharedContext);
     // @ts-ignore
     noteCategoryContext.addCategory = async function (categoryName) {
         const createdCategory = await repository.addNewCategory(categoryName);
         noteCategoryContext.categoryList.push(createdCategory);
-        console.log("Adding category", noteCategoryContext.categoryList);
     }
 
     // @ts-ignorez
@@ -44,7 +45,6 @@ function App() {
         const loadedCategories = await repository.loadCategories();
         // @ts-ignore
         noteCategoryContext.categoryList = loadedCategories;
-        //console.log("LOADED CATEGORIES: ", loadedCategories);
     }
 
     // @ts-ignore
@@ -52,6 +52,7 @@ function App() {
         repository.addNoteToCategory(note, category);
     }
 
+    // @ts-ignore
     noteCategoryContext.calculateNewPosition = async function (note) {
         const notes = await repository.getAllNotes();
 
@@ -67,7 +68,6 @@ function App() {
                 var rightBottomCorner = {x: -Infinity, y: Infinity};
 
 
-                console.log("TARGET: ", elm._name)
                 elm.notesList.forEach( n => {
                     const fn = notes.find(tn => tn._id == n);
                     elm.x = fn._x;
@@ -89,12 +89,33 @@ function App() {
 
                 })
                 elm.x = leftTopCorner.x;
-                elm.y = leftTopCorner.y;
+                elm.y = leftTopCorner.y - 120;
                 await repository.changeCategoryPosition(elm);
             })
         )
 
         return await repository.loadCategories();
+    }
+
+
+    // @ts-ignore
+    noteContext.getNote = async function(noteId: string) : Promise<NoteClass>{
+       console.log("TRYING TO GET NOTE: ", noteId);
+       const note = await  repository.getNoteById(noteId);
+       return note;
+    }
+
+    // @ts-ignore
+    noteContext.addCategoryToNote = async function(noteId: string, cat: CategoryClass) {
+        repository.addCategoryToNote(noteId, cat);
+    }
+
+
+    // @ts-ignore
+    noteContext.loadNoteCategories = async function(noteId: string) {
+        const note = await repository.getNoteById(noteId);
+        if(note._categories == null) return [];
+        return note._categories;
     }
 
 

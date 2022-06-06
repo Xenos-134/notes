@@ -1,3 +1,5 @@
+import {CategoryClass} from "./CategoryClass";
+
 export class NoteClass {
     _title: string;
     _body: string;
@@ -7,12 +9,14 @@ export class NoteClass {
     _x: number;
     _y: number;
     _color: number;
+    _categories: Array<CategoryClass>;
 
     constructor(title: string, body: string) {
         if (!title || !body) throw new Error("Incorrect Arguments"); //TODO CREATE CUSTOM ERRORS
         this._id = title.concat(Date.now().toString());
         this._title = title;
         this._body = body
+        this._categories = [];
     }
 
     getTitle(): string {

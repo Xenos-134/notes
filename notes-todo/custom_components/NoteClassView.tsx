@@ -31,10 +31,12 @@ export default function NoteClassView(
 
     return (
             <Animated.View style={rStyle}>
-                <View style={styles.note_category_view}>
-                    <Text style={styles.note_category_text}>
-                        {category._name}
-                    </Text>
+                <View style={styles.noteCategoryOut}>
+                    <View style={styles.note_category_view}>
+                        <Text style={styles.note_category_text}>
+                            {category._name}
+                        </Text>
+                    </View>
                 </View>
             </Animated.View>
     )
@@ -46,12 +48,23 @@ const styles = StyleSheet.create({
         width: 300,
         height: 50,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
+        left: -2,
+        top: -2,
     },
     note_category_text: {
         fontWeight: "600",
         fontSize: 18,
         color: "#ebdbb2"
+    },
+    noteCategoryOut: {
+        position: "absolute",
+        alignItems: "flex-start",
+        justifyContent: "flex-start",
+        width: 600,
+        height: 600,
+        borderWidth: 5,
+        borderColor: '#665c54',
     }
 
 });

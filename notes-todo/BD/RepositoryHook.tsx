@@ -9,11 +9,6 @@ const CATEGORY_KEYS = "@categoriesKeysList";
 
 
 export function RepositoryHook() {
-    const [firstRun, setFirstRun] = useState(true);
-
-
-
-
     useEffect(()=>{
         //AsyncStorage.clear();
     },[])
@@ -21,29 +16,28 @@ export function RepositoryHook() {
 
     async function add(item: NoteClass) {
         const loadedNotes = await getAllNotes();
-        console.log(loadedNotes)
         if(loadedNotes == null || loadedNotes.length == 0) {
             //setItemArray([item]);
             await AsyncStorage.setItem(noteStorageKey, JSON.stringify([item]));
-            console.log("XXX")
-
             return;
         }
         const parsedList = await JSON.parse(loadedNotes);
         parsedList.push(item);
-        AsyncStorage.setItem(noteStorageKey, JSON.stringify(parsedList));
-        console.log("SUCESS")
+        await AsyncStorage.setItem(noteStorageKey, JSON.stringify(parsedList));
     };
 
 
-    function get(): NoteClass {
-        //TODO
+    async function getNoteById(noteId: string): Promise<NoteClass> {
+        const notesList = await loadNotesList();
+        const note = notesList.find( n => n._id === noteId);
+        return note;
     }
 
 
-    async function loadNotesList() {
+    async function loadNotesList() : Promise<Array<NoteClass>> {
         const loadedNotesList = await AsyncStorage.getItem(noteStorageKey)
         const parsedList = await JSON.parse(loadedNotesList);
+        return parsedList;
     }
 
 
@@ -92,7 +86,6 @@ export function RepositoryHook() {
     async function remove(note: NoteClass) {
         const notes_list = await getAllNotes();
         const filtered_list =  notes_list.filter(n => n._id != note._id);
-        console.log("NOTES LIST AFTHER DELETE: ", filtered_list);
         await AsyncStorage.setItem('@notesList', JSON.stringify(filtered_list));
         return;
     }
@@ -101,15 +94,12 @@ export function RepositoryHook() {
     //             TESTING NOTES CATEGORY (START)
     //===========================================================
     async function addNewCategory(name:string) : Promise<CategoryClass> {
-        console.log("ADDING NEW CATEGORY: ",name);
         const newCategory = new CategoryClass(name);
         const keys = await getCategoryKeys();
         if(keys.includes(name)) {
-            console.log("ERROR: CANNOT ADD CATEGORY, ALREADY EXIST");
             return; //THROW ERROR HERE
         }
         await addCategoryKey(name);
-        console.log("!!!")
         AsyncStorage.setItem(name, JSON.stringify(newCategory));
         return newCategory;
     }
@@ -118,7 +108,6 @@ export function RepositoryHook() {
     async function addNoteToCategory(note: NoteClass ,category: CategoryClass) {
         const loadedCategory = await getCategory(category._name);
         loadedCategory.notesList.push(note._id);
-        console.log("ADDING NOTE TO CATEGORY: ", loadedCategory, note._title);
         AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory));
     }
 
@@ -136,15 +125,12 @@ export function RepositoryHook() {
         if(!loadedKeys.includes(key)) return;
         const loadedCategory = await AsyncStorage.getItem(key);
         const parsedCategory = await JSON.parse(loadedCategory);
-        console.log(">>>>>>>",parsedCategory)
         return parsedCategory
     }
 
     async function addCategoryKey(key: string) {
-        console.log("ADDING KEY");
         const keys = await getCategoryKeys();
         if(keys.includes(key)) {
-            console.log("ESTA KEY JA EXISTE");
             return; //THROW ERROR HERE PROB
         }
         keys.push(key);
@@ -158,7 +144,6 @@ export function RepositoryHook() {
 
     async function getCategoryKeys() : Promise<Array<string>> {
         const keys = await AsyncStorage.getItem(CATEGORY_KEYS);
-        console.log("Loaded  Category Keys: ", keys);
         if(keys == null) return [];
         return JSON.parse(keys);
     }
@@ -174,9 +159,25 @@ export function RepositoryHook() {
             const parsedCategory = JSON.parse(category);
             categories.push(parsedCategory);
         }
-        console.log("Loaded  CATEGORIES: ", categories);
         return categories;
     }
+
+
+    async function addCategoryToNote(noteId: string, cat: CategoryClass) {
+        const notes = await getAllNotes();
+        const note = notes.find(n => n._id === noteId);
+
+        //FIXME S- REMOVER ESTA PARTE
+        if(note._categories == null) note._categories = [];
+        //FIXME E- REMOVER ESTA PARTE
+        if(note._categories.some(c => c._name == cat._name)) return;
+        note._categories.push(cat);
+        console.log("NOTE: ", notes);
+        updateNotes(notes);
+    }
+
+
+
     //===========================================================
     //             TESTING NOTES CATEGORY (END)
     //===========================================================
@@ -184,7 +185,7 @@ export function RepositoryHook() {
     return {
         add,
         remove,
-        get,
+        getNoteById,
         getAllNotes,
         loadNotesList,
         updateElement,
@@ -192,6 +193,7 @@ export function RepositoryHook() {
         addNewCategory,
         addNoteToCategory,
         loadCategories,
-        changeCategoryPosition
+        changeCategoryPosition,
+        addCategoryToNote
     }
 }

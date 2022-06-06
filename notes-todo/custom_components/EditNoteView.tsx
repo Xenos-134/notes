@@ -4,29 +4,41 @@ import CategoryBadge from "./badges/CategoryBadge";
 import AddBadge from "./badges/AddBadge";
 import BadgeListView from "./badges/BadgeListView";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
+import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 
 export default function EditNoteView({route, navigation}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
     const [body, setBody] = useState(route.params.targetNote._body);
     const [color, setColor] = useState("#fabd2f");
     const [openCategorySelector, setOCS] = useState(false);
+    const [categories, setCategories] = useState([]);
 
     //TODO ADICIONAR SELECTOR DE CORES RADIAL
     //===========================================================
     //            CONTEXTS
     //===========================================================
     const categoryContext = useContext(CategorySharedContext);
+    const noteContext = useContext(NoteSharedContext);
 
 
     useEffect(()=>{
-        console.log("RECEIVED TODO", route.params.loadedCategories)
-
-
+        console.log("RECEIVED TODO", route.params.targetNote)
         if(route.params.targetNote._color != null) {
             setColor(route.params.targetNote._color);
         }
-
+        loadNoteBadges();
     },[])
+
+    async function loadNoteBadges() {
+        const badgeList = await noteContext.loadNoteCategories(route.params.targetNote._id);
+        var badgeNamesList = [];
+        badgeList.forEach(elm => {
+            badgeNamesList.push(elm._name);
+        })
+
+        console.log("LOADED CATEGORIES:", badgeNamesList);
+        setCategories(badgeList);
+    }
 
     function saveNoteChanges() {
         const noteCoppy = route.params.targetNote;
@@ -46,10 +58,6 @@ export default function EditNoteView({route, navigation}) {
 
     function changeColor(color: string) {
         setColor(color);
-    }
-
-    function addCategory() {
-        route.params.addNoteToCategory(route.params.targetNote);
     }
 
     function openCategoryList() {
@@ -72,7 +80,11 @@ export default function EditNoteView({route, navigation}) {
                     onChangeText={setBody}
                 />
                 <View style={styles.badges_view}>
-                    <CategoryBadge text={"Test Bage"}/>
+                    {
+                        categories.map( cat => (
+                            <CategoryBadge text={cat._name}/>
+                        ))
+                    }
                     <AddBadge openCategoryList={openCategoryList}/>
                 </View>
                 {
