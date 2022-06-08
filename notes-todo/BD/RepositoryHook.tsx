@@ -79,8 +79,9 @@ export function RepositoryHook() {
         const newListx = await getAllNotes();
     }
 
-    function updateNotes(noteList: Array<NoteClass>) {
-        AsyncStorage.setItem('@notesList', JSON.stringify(noteList));
+    async function updateNotes(noteList: Array<NoteClass>) {
+        const savedNotes = await AsyncStorage.setItem('@notesList', JSON.stringify(noteList));
+        return savedNotes;
     }
 
     async function remove(note: NoteClass) {
@@ -109,10 +110,6 @@ export function RepositoryHook() {
         const loadedCategory = await getCategory(category._name);
         loadedCategory.notesList.push(note._id);
         AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory));
-    }
-
-    function removeNoteFromCategory(note: NoteClass) {
-        //TODO
     }
 
     async function changeCategoryPosition(category : CategoryClass) {
@@ -176,7 +173,40 @@ export function RepositoryHook() {
         updateNotes(notes);
     }
 
+    async function removeCategoryFromNote(noteId: string, cat: CategoryClass) {
+        const notes = await getAllNotes();
+        const note = notes.find(n => n._id === noteId);
 
+        //FIXME S- REMOVER ESTA PARTE
+        if(note._categories == null) note._categories = [];
+        //FIXME E- REMOVER ESTA PARTE
+        console.log(">>>NOTE: ", note._categories);
+        await removeNoteFromCategory(noteId, cat._name);
+        note._categories = note._categories.filter(c => c._name !== cat._name);
+        const newNoteList = await updateNotes(notes);
+        return newNoteList;
+    }
+
+    async function removeCategory() {
+        //TODO
+    }
+
+
+    async function removeNoteFromCategory(noteId: string, categoryId: string) {
+        const category = await getCategoryById(categoryId);
+
+        // @ts-ignore
+        category.notesList = category.notesList.filter(n => n._id == noteId);
+        console.log("NEW CATEGORY:", category);
+        AsyncStorage.setItem(categoryId, JSON.stringify(category));
+    }
+
+    async function getCategoryById(catId: string) {
+        const category = await AsyncStorage.getItem(catId);
+        if(category == null) return; //THROW ERROR HERE
+        const parsedCategory = await JSON.parse(category);
+        return parsedCategory;
+    }
 
     //===========================================================
     //             TESTING NOTES CATEGORY (END)
@@ -194,6 +224,7 @@ export function RepositoryHook() {
         addNoteToCategory,
         loadCategories,
         changeCategoryPosition,
-        addCategoryToNote
+        addCategoryToNote,
+        removeCategoryFromNote
     }
 }

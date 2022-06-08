@@ -222,7 +222,6 @@ export default function MainScreen({navigation}) {
     async function reaclculateNotesView(note : NoteClass) {
         setTimeout(async function () {
             const loadedCategories = await categoryContext.calculateNewPosition(note);
-            console.log("REACLCUALTING POSITIONXXXXXXXXXXXXXXXXXXXXXXXXXXXXX WAIT ED 5 SEC");
             setLoadedCategories(loadedCategories);
         }, 200);
 

@@ -5,6 +5,7 @@ import AddBadge from "./badges/AddBadge";
 import BadgeListView from "./badges/BadgeListView";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
+import {CategoryClass} from "../custom_classes/CategoryClass";
 
 export default function EditNoteView({route, navigation}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
@@ -65,6 +66,13 @@ export default function EditNoteView({route, navigation}) {
         setOCS(!openCategorySelector);
     }
 
+    async function removeCategory(cat: CategoryClass) {
+        console.log("WILL REMOVE BADGE");
+        await noteContext.removeCategoryFromNote(route.params.targetNote._id, cat);
+        loadNoteBadges();
+
+    }
+
     return (
         <View style={[styles.edit_note_view, {backgroundColor: color}]}>
             <View style={styles.edit_note_text_view}>
@@ -82,7 +90,10 @@ export default function EditNoteView({route, navigation}) {
                 <View style={styles.badges_view}>
                     {
                         categories.map( cat => (
-                            <CategoryBadge text={cat._name}/>
+                            <CategoryBadge
+                                remove={removeCategory}
+                                cat={cat}
+                            />
                         ))
                     }
                     <AddBadge openCategoryList={openCategoryList}/>

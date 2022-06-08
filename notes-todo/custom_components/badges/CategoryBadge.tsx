@@ -1,13 +1,15 @@
-import {StyleSheet, Text, View} from "react-native";
+import {StyleSheet, Text, TouchableHighlight, View} from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-export default function CategoryBadge({text}) { //TODO ADICIONAR COR
+export default function CategoryBadge({cat, remove}) { //TODO ADICIONAR COR
     return (
         <View style={styles.category_badge_view} >
-            <Text style={styles.category_badge_text}>{text}</Text>
-            <View style={styles.icon_view}>
+            <Text style={styles.category_badge_text}>{cat._name}</Text>
+            <TouchableHighlight
+                onPress={()=>remove(cat)}
+                style={styles.icon_view}>
                 <Icon name="close" size={25} color="#282828" />
-            </View>
+            </TouchableHighlight>
         </View>
     )
 }

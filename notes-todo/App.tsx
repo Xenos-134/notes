@@ -118,6 +118,11 @@ function App() {
         return note._categories;
     }
 
+    noteContext.removeCategoryFromNote = async function(noteId: string, cat: CategoryClass) {
+        console.log("WILL REMOVE FROM CAT: ", cat._name)
+        repository.removeCategoryFromNote(noteId, cat);
+    }
+
 
     //===========================================================
     //             INITIALIZATION OF CONTEXT (END)
