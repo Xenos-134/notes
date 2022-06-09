@@ -14,20 +14,27 @@ import {CategoryClass} from "./custom_classes/CategoryClass";
 import {RepositoryHook} from "./BD/RepositoryHook";
 import {NoteClass} from "./custom_classes/NoteClass";
 import {NoteSharedContext} from "./shared_contexts/NotesSharedContext";
+import {ViewDimensionsContext} from "./shared_contexts/ViewDimensionContext";
 
 
 const Stack = createStackNavigator();
 
 function App() {
     const [categoriesLoaded, setCategoiesLoaded] = useState(false);
-
-    //===========================================================
-    //             INITIALIZATION OF CONTEXT (START)
-    //===========================================================
     const repository = RepositoryHook();
 
+
+//===========================================================
+//             INITIALIZATION OF CONTEXT (START)
+//===========================================================
     const noteContext = useContext(NoteSharedContext);
     const noteCategoryContext = useContext(CategorySharedContext);
+    const viewDimensionsContext = useContext(ViewDimensionsContext);
+
+    //===========================================================
+    //              Note Category Context
+    //===========================================================
+
     // @ts-ignore
     noteCategoryContext.addCategory = async function (categoryName) {
         const createdCategory = await repository.addNewCategory(categoryName);
@@ -52,6 +59,8 @@ function App() {
         repository.addNoteToCategory(note, category);
     }
 
+
+    //CALCULATES MOST TOP AND MOST BOT POSITION OF THE NOTES OF SAME CATEGORY
     // @ts-ignore
     noteCategoryContext.calculateNewPosition = async function (note) {
         const notes = await repository.getAllNotes();
@@ -65,7 +74,7 @@ function App() {
         Promise.all(
             targetCategories.map( async elm=> {
                 var leftTopCorner = {x: Infinity, y: Infinity};
-                var rightBottomCorner = {x: -Infinity, y: Infinity};
+                var rightBottomCorner = {x: -Infinity, y: -Infinity};
 
 
                 elm.notesList.forEach( n => {
@@ -87,17 +96,26 @@ function App() {
                         rightBottomCorner.y = fn._y;
                     }
 
-                })
-                elm.x = leftTopCorner.x;
-                elm.y = leftTopCorner.y - 120;
+                });
+                elm.x = leftTopCorner.x - 20; //ADD SMALL VALUE TO NOT MAKE SMALL MARGIN BETWEEN NOTE AND CAT BORDER
+                elm.y = leftTopCorner.y - 80;
+
+                elm.bx = rightBottomCorner.x + 120 * 1/viewDimensionsContext.scaleValue;
+                elm.by = rightBottomCorner.y + 120 * 1/viewDimensionsContext.scaleValue;
                 await repository.changeCategoryPosition(elm);
             })
         )
-
         return await repository.loadCategories();
     }
 
+    noteCategoryContext.getAllCategories = async function () : Promise<Array<CategoryClass>>{
+        const categories = await repository.loadCategories();
+        return categories;
+    }
 
+    //===========================================================
+    //              Note  Context
+    //===========================================================
     // @ts-ignore
     noteContext.getNote = async function(noteId: string) : Promise<NoteClass>{
        console.log("TRYING TO GET NOTE: ", noteId);
@@ -118,15 +136,29 @@ function App() {
         return note._categories;
     }
 
+    // @ts-ignore
     noteContext.removeCategoryFromNote = async function(noteId: string, cat: CategoryClass) {
         console.log("WILL REMOVE FROM CAT: ", cat._name)
         repository.removeCategoryFromNote(noteId, cat);
     }
 
+    noteContext.getAllNotes = async function() : Promise<Array<NoteClass>> {
+        const notes = await repository.getAllNotes();
+        return notes;
+    }
 
     //===========================================================
-    //             INITIALIZATION OF CONTEXT (END)
+    //              View Dimensions Context
     //===========================================================
+    viewDimensionsContext.getScaleValue = function () {
+        console.log("CURRENT SCALE VALUE: ", viewDimensionsContext.scaleValue);
+    }
+
+//===========================================================
+//             INITIALIZATION OF CONTEXT (END)
+//===========================================================
+
+
     useEffect(()=>{
         if(categoriesLoaded) return;
         noteCategoryContext.loadCategoriesFromRepository();

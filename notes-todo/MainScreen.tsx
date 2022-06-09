@@ -23,6 +23,7 @@ import ShowAllNotesButton from "./custom_components/Buttons/NoteListButton";
 import {CategoryClass} from "./custom_classes/CategoryClass";
 import NoteClassView from "./custom_components/NoteClassView";
 import {CategorySharedContext} from "./shared_contexts/CategorySharedContext";
+import {ViewDimensionsContext} from "./shared_contexts/ViewDimensionContext";
 
 type ContextType = {
     translateX: number;
@@ -45,9 +46,10 @@ export default function MainScreen({navigation}) {
         console.log("CREATING NEW CATEGORY")
         const category1 = createNewCategory("Test Category 1");
         loadCategoriesFromRepository();
-        //repository.addNewCategory("Test Category 1");
         category1.setPosition(100, -350);
         pushCategory(category1);
+
+        viewDimensionsContext.scaleValue = scaleValue.value;
 
     },[])
 
@@ -83,6 +85,11 @@ export default function MainScreen({navigation}) {
     const transformValueX = useSharedValue(0);
     const transformValueY = useSharedValue(0);
     const scaleValue = useSharedValue(0.5);
+
+    //===========================================================
+    //              SHARED CONTEXT
+    //===========================================================
+    const viewDimensionsContext = useContext(ViewDimensionsContext);
 
 
     //===========================================================
@@ -170,10 +177,15 @@ export default function MainScreen({navigation}) {
 
     function scaleUp() {
         scaleValue.value+=0.2;
+        viewDimensionsContext.scaleValue = scaleValue.value;
+        console.log(viewDimensionsContext.scaleValue, scaleValue.value);
+
     }
 
     function scaleDown() {
         scaleValue.value-=0.2;
+        viewDimensionsContext.scaleValue = scaleValue.value;
+        console.log(viewDimensionsContext.scaleValue, scaleValue.value);
     }
 
     function editNote(noteId: number) { //TODO PASSAR NoteClass por inteiro para o TodoStickerView e depois devolver aqui

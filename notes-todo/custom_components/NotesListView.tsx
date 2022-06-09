@@ -17,6 +17,7 @@ import {Swipeable} from "react-native-gesture-handler";
 import NewCategoryFormView from "./forms/NewCategoryForm";
 import {RepositoryHook} from "../BD/RepositoryHook";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
+import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 
 export default function NotesListView({navigation, route}) {
     //===========================================================
@@ -33,9 +34,11 @@ export default function NotesListView({navigation, route}) {
     //===========================================================
     const repository = RepositoryHook();
     const categoryContext = useContext(CategorySharedContext);
+    const noteContext = useContext(NoteSharedContext);
 
     useEffect(()=>{
-        console.log("RECEIVED PARAMS:\n", route.params.notesList);
+        //console.log("RECEIVED PARAMS:\n", route.params.notesList);
+        generateNotesList();
         setN(route.params.notesList);
     },[])
 
@@ -77,6 +80,32 @@ export default function NotesListView({navigation, route}) {
         //repository.addNewCategory(categoryName);
         categoryContext.addCategory(categoryName);
         hideCategotryForm();
+    }
+
+
+    //CURRENTLY REFORMATTING CODE TO ACCESS NOTES AND CATGORIES LIST FROM CONTEXTS
+    // WILL USE THIS METHOD LATER
+    async function generateNotesList() {
+        const notes = await noteContext.getAllNotes();
+        const categories = await categoryContext.getAllCategories();
+        console.log('======================LOADED NOTES ==================');
+        console.log(notes);
+        console.log('=====================LOADED  CATEGORIES==================');
+        console.log(categories);
+        console.log('============================================');
+
+        var noteCategoryList = []
+
+        categories.forEach(c => {
+            console.log("C_NAME: ", c._name, ">>>>");
+            var notesList = [];
+            c.notesList.forEach(n => {
+                const note = notes.find(elm => elm._id == n);
+                notesList.push(note);
+            })
+            noteCategoryList.push({category_name: c._name, notes: notesList});
+        })
+        console.log("CATEGORY NOTES ARRAY: ", noteCategoryList);
     }
 
     return (

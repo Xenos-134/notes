@@ -1,4 +1,14 @@
-import {View, Text, StyleSheet, TextInput, Button, LogBox, TouchableHighlight} from "react-native";
+import {
+    View,
+    Text,
+    StyleSheet,
+    TextInput,
+    Button,
+    LogBox,
+    TouchableHighlight,
+    ScrollView,
+    Dimensions
+} from "react-native";
 import {useContext, useEffect, useState} from "react";
 import CategoryBadge from "./badges/CategoryBadge";
 import AddBadge from "./badges/AddBadge";
@@ -6,6 +16,9 @@ import BadgeListView from "./badges/BadgeListView";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 import {CategoryClass} from "../custom_classes/CategoryClass";
+
+
+const SCREEN = Dimensions.get("screen");
 
 export default function EditNoteView({route, navigation}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
@@ -67,10 +80,19 @@ export default function EditNoteView({route, navigation}) {
     }
 
     async function removeCategory(cat: CategoryClass) {
-        console.log("WILL REMOVE BADGE");
+        console.log("BADGE LIST", categories);
         await noteContext.removeCategoryFromNote(route.params.targetNote._id, cat);
-        loadNoteBadges();
+        const newCategoryList = categories.filter(elm => elm._name != cat._name);
+        setCategories([...newCategoryList]);
+    }
 
+    function addCategory(cat: CategoryClass) {
+        //FOR SOME REASON .includes dnt work here
+        const exist = categories.some(c => c._name == cat._name);
+        console.log("EXIST: ", exist)
+        openCategoryList();
+        if(exist) return;
+        setCategories([...categories, cat]);
     }
 
     return (
@@ -88,18 +110,22 @@ export default function EditNoteView({route, navigation}) {
                     onChangeText={setBody}
                 />
                 <View style={styles.badges_view}>
-                    {
-                        categories.map( cat => (
-                            <CategoryBadge
-                                remove={removeCategory}
-                                cat={cat}
-                            />
-                        ))
-                    }
-                    <AddBadge openCategoryList={openCategoryList}/>
+                    <ScrollView horizontal={true}>
+                        <AddBadge openCategoryList={openCategoryList}/>
+                        {
+                            categories.map( cat => (
+                                <CategoryBadge
+                                    remove={removeCategory}
+                                    cat={cat}
+                                />
+                            ))
+                        }
+                    </ScrollView>
+
                 </View>
                 {
                     openCategorySelector && <BadgeListView
+                        add={addCategory}
                         note={route.params.targetNote}
                         categoriesList={categoryContext.categoryList}/>
                 }
@@ -146,6 +172,9 @@ function ColorSelector({changeColorMethod}) {
 
 
 const styles = StyleSheet.create({
+    badges_scroll_view: {
+      flexDirection: "row"
+    },
     color_selector_main_view: {
         flexDirection: "row",
         justifyContent: "flex-start",
@@ -165,7 +194,6 @@ const styles = StyleSheet.create({
     },
     edit_note_text_view: {
         marginTop: "15%",
-        marginHorizontal: '5%',
     },
     edit_note_title_text: {
         color: "#1d2021",
@@ -176,13 +204,15 @@ const styles = StyleSheet.create({
         color: "#1d2021",
         fontWeight: "600",
         fontSize:17,
+        marginHorizontal: "5%"
     },
     edit_note_body_text_input: {
         color: "#1d2021",
         fontWeight: "600",
         fontSize:17,
         marginTop: "7%",
-        marginBottom: "7%"
+        marginBottom: "7%",
+        marginHorizontal: "5%"
     },
     save_changes_button: {
         alignItems:"center",
@@ -218,6 +248,7 @@ const styles = StyleSheet.create({
     },
     badges_view: {
         flexDirection: "row",
+        width: SCREEN.width,
     }
 })
 

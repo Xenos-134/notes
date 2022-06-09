@@ -7,7 +7,7 @@ import {NoteSharedContext} from "../../shared_contexts/NotesSharedContext";
 
 const SCREEN = Dimensions.get("screen");
 
-export default function BadgeListView({categoriesList, note}) {
+export default function BadgeListView({categoriesList, note, add}) {
     const categoryContext = useContext(CategorySharedContext);
     const noteContext = useContext(NoteSharedContext);
 
@@ -15,6 +15,7 @@ export default function BadgeListView({categoriesList, note}) {
         console.log("ADDING :", category)
         categoryContext.addNoteToCategory(note, category);
         noteContext.addCategoryToNote(note._id, category);
+        add(category);
     }
 
 

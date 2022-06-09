@@ -15,6 +15,8 @@ export default function AddBadge({openCategoryList}) {
                 flexDirection: "row",
                 borderRadius: 10,
                 elevation: 10,
+                marginRight: 10,
+                marginLeft: 20,
             }
         }>
             <Icon name="add" size={25} color="#282828" />

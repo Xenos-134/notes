@@ -8,4 +8,5 @@ export const NoteSharedContext = React.createContext({
     addCategoryToNote: Noot,
     removeCategoryFromNote: Noot,
     loadNoteCategories: Noot,
+    getAllNotes: Noot,
 })

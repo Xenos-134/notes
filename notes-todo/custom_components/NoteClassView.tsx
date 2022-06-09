@@ -5,6 +5,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
+import {useEffect} from "react";
 
 export default function NoteClassView(
     {
@@ -13,6 +14,10 @@ export default function NoteClassView(
         scale,
         category,
     }) {
+
+
+    useEffect(()=>{
+    },[])
 
 
     const rStyle = useAnimatedStyle(() => {
@@ -24,20 +29,46 @@ export default function NoteClassView(
                 {
                     translateY: scale.value * (category.y - referentialY.value),
                 },
-                {scale: scale.value * 1.8}
+                {scale: scale.value}
             ],
         };
     });
 
+    function calculateViewWidth(x: number, bx: number) {
+        'worklet'
+        if(Math.abs(x - bx)  < 400) return 400;
+        return  Math.abs(x - bx);
+    }
+
+    function calculateViewHeight(y: number, by: number) {
+        'worklet'
+        if(Math.abs(y - by)  < 400) return 400;
+        return  Math.abs(y - by);
+    }
+
+
+    const categoryViewDimensions = useAnimatedStyle(() => {
+        const categoryViewWidth = category.x - category.bx;
+        const categoryViewHeight = category.y - category.by;
+
+        console.log(`Name ${category._name}: Width: ${categoryViewWidth} Heigth: ${categoryViewHeight}`);
+
+        return {
+            width: calculateViewWidth(category.x, category.bx),
+            height: calculateViewHeight(category.y, category.by),
+        };
+    });
+
+
     return (
             <Animated.View style={rStyle}>
-                <View style={styles.noteCategoryOut}>
+                <Animated.View style={[styles.noteCategoryOut, categoryViewDimensions]}>
                     <View style={styles.note_category_view}>
                         <Text style={styles.note_category_text}>
                             {category._name}
                         </Text>
                     </View>
-                </View>
+                </Animated.View>
             </Animated.View>
     )
 }
@@ -61,8 +92,6 @@ const styles = StyleSheet.create({
         position: "absolute",
         alignItems: "flex-start",
         justifyContent: "flex-start",
-        width: 600,
-        height: 600,
         borderWidth: 5,
         borderColor: '#665c54',
     }
