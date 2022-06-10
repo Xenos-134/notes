@@ -18,6 +18,7 @@ import NewCategoryFormView from "./forms/NewCategoryForm";
 import {RepositoryHook} from "../BD/RepositoryHook";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
+import LoadingView from "./LoadingView";
 
 export default function NotesListView({navigation, route}) {
     //===========================================================
@@ -26,8 +27,9 @@ export default function NotesListView({navigation, route}) {
     const [n, setN] = useState([]);
     const [deletedElement, setDeletedElement] = useState(null)
     const [visibleNewCategory, setVisibleNewCategory] = useState(false);
-    const a = useRef([]);
     const [notesList, setNotesList] = useState([]);
+    const [isLoaded, setLoaded] = useState(false);
+    const a = useRef([]);
 
 
     //===========================================================
@@ -113,7 +115,6 @@ export default function NotesListView({navigation, route}) {
         var noteCategoryList = []
 
         categories.forEach(c => {
-            console.log("C_NAME: ", c._name, ">>>>");
             var notesList = [];
             c.notesList.forEach(n => {
                 const note = notes.find(elm => elm._id == n);
@@ -127,8 +128,14 @@ export default function NotesListView({navigation, route}) {
         console.log("NON CATEGORY NOTES",non_category_notes);
         //Adding notes withou category
         noteCategoryList.push({title: "Without Category", data: non_category_notes});
-
         setNotesList(noteCategoryList);
+        setLoaded(true);
+    }
+
+    if(!isLoaded) {
+        return (
+            <LoadingView/>
+        )
     }
 
     return (

@@ -5,7 +5,7 @@ export default function LoadingView() {
     return (
         <View style={styles.loading_main_view}>
             <LottieView
-                style={{transform: [{scale: 1.2}]}}
+                style={{transform: [{scale: 1}]}}
                 source={require('../animations/notepad_animation.json')} autoPlay loop />
         </View>
     )
