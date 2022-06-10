@@ -12,6 +12,15 @@ export default function NoteListItem({note}) {
                 <Text style={styles.body_text}>
                     {note._body}
                 </Text>
+                <View style={{
+                    borderWidth: 0.7,
+                    width: "90%",
+                    position: "absolute",
+                    bottom: 0,
+                    borderColor: "#282828"
+                }}>
+
+                </View>
             </View>
     )
 }
@@ -22,7 +31,7 @@ const styles = StyleSheet.create({
         alignItems:"center",
         width:  "100%",
         height: 150, //TODO ALTERAR ISTO PARA SER ATRAVES DE DIMNENSIONS
-        elevation: 10
+        elevation: 10,
     },
     title_text: {
         marginTop: 10,

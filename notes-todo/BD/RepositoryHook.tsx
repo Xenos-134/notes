@@ -21,9 +21,11 @@ export function RepositoryHook() {
             await AsyncStorage.setItem(noteStorageKey, JSON.stringify([item]));
             return;
         }
-        const parsedList = await JSON.parse(loadedNotes);
-        parsedList.push(item);
-        await AsyncStorage.setItem(noteStorageKey, JSON.stringify(parsedList));
+        //console.log(">>>>>>> ", typeof(loadedNotes));
+
+        //const parsedList = await JSON.parse(loadedNotes);
+        loadedNotes.push(item);
+        await AsyncStorage.setItem(noteStorageKey, JSON.stringify(loadedNotes));
     };
 
 

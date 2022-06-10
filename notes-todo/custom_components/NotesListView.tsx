@@ -1,4 +1,4 @@
-import {Text, View, StyleSheet, ScrollView, TouchableHighlight, Button} from "react-native";
+import {Text, View, StyleSheet, ScrollView, TouchableHighlight, Button, SectionList, StatusBar} from "react-native";
 import {useContext, useEffect, useRef, useState} from "react";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -27,6 +27,7 @@ export default function NotesListView({navigation, route}) {
     const [deletedElement, setDeletedElement] = useState(null)
     const [visibleNewCategory, setVisibleNewCategory] = useState(false);
     const a = useRef([]);
+    const [notesList, setNotesList] = useState([]);
 
 
     //===========================================================
@@ -68,7 +69,7 @@ export default function NotesListView({navigation, route}) {
     }
 
     function showNewCategotryForm() {
-        setVisibleNewCategory(true);
+        setVisibleNewCategory(!visibleNewCategory);
     }
 
     function hideCategotryForm() {
@@ -83,10 +84,25 @@ export default function NotesListView({navigation, route}) {
     }
 
 
+    const Item = ({note}) => (
+        <Swipeable key={note._id}
+                   ref = {ref => {
+                       a.current[note.title] = ref
+                   }}
+                   renderRightActions={()=>Box(deleteNote, editNote, findNote, note)}>
+            <NoteListItem
+                key={note._id}
+                note={note}/>
+        </Swipeable>
+    );
+
+
+
     //CURRENTLY REFORMATTING CODE TO ACCESS NOTES AND CATGORIES LIST FROM CONTEXTS
     // WILL USE THIS METHOD LATER
     async function generateNotesList() {
         const notes = await noteContext.getAllNotes();
+        var non_category_notes = notes;
         const categories = await categoryContext.getAllCategories();
         console.log('======================LOADED NOTES ==================');
         console.log(notes);
@@ -101,11 +117,18 @@ export default function NotesListView({navigation, route}) {
             var notesList = [];
             c.notesList.forEach(n => {
                 const note = notes.find(elm => elm._id == n);
+                non_category_notes = non_category_notes.filter(e => e._id != n);
+                if(notesList.some(elm => elm._id == n)) return;
                 notesList.push(note);
             })
-            noteCategoryList.push({category_name: c._name, notes: notesList});
+            noteCategoryList.push({title: c._name, data: notesList});
         })
-        console.log("CATEGORY NOTES ARRAY: ", noteCategoryList);
+        //console.log("CATEGORY NOTES ARRAY: ", noteCategoryList);
+        console.log("NON CATEGORY NOTES",non_category_notes);
+        //Adding notes withou category
+        noteCategoryList.push({title: "Without Category", data: non_category_notes});
+
+        setNotesList(noteCategoryList);
     }
 
     return (
@@ -114,31 +137,25 @@ export default function NotesListView({navigation, route}) {
                 visibleNewCategory && <NewCategoryFormView
                     createNewCategory={createNewCategory}/>
             }
-            <ScrollView
+            <View
                 style={{paddingTop: 40, width: "100%"}}>
                 <View style={styles.notes_list_header_view}>
                     <Text style={styles.notes_list_header_text}>
                         Notes
                     </Text>
-                    <Button title={"NEW CATEGORY"}
-                        onPress={showNewCategotryForm}
-                    />
+                    <NewCategryButton method={showNewCategotryForm}/>
                 </View>
-                {
-                    n.map(note => (
-                        <Swipeable key={note._id}
-                                   ref = {ref => {
-                                       a.current[note.title] = ref
-                                   }}
-
-                                   renderRightActions={()=>Box(deleteNote, editNote, findNote, note)}>
-                            <NoteListItem
-                                key={note._id}
-                                note={note}/>
-                        </Swipeable>
-                    ))
-                }
-            </ScrollView>
+                <SectionList
+                    stickySectionHeadersEnabled
+                    sections={notesList}
+                    keyExtractor={(item, index) => item + index}
+                    renderItem={({ item }) => <Item note={item} />}
+                    renderSectionHeader={({ section: { title } }) => (
+                        <Separator text={title}/>
+                    )}
+                    ListFooterComponent={()=> <Footer/>}
+                />
+            </View>
         </View>
     )
 }
@@ -161,13 +178,67 @@ function Box(deleteMethod, editNote, findNote, note) {
                 onPress={()=>deleteMethod(note)}>
                 <Icon name="delete" size={30} color="#900" />
             </TouchableHighlight>
-
         </View>
     )
 }
 
 
+const Separator = ({ text }) => (
+    <View style={styles.flatlist_separator}>
+        <Text style={{
+            color: "#ebdbb2",
+            fontSize: 18,
+            fontWeight: "700",
+        }}>{text}</Text>
+    </View>
+);
+
+function NewCategryButton({method}) {
+    return (
+        <TouchableHighlight
+            onPress={method}
+            style={styles.new_category_button}
+        >
+            <View>
+                <Text style={styles.new_category_button_text}>New Category</Text>
+            </View>
+        </TouchableHighlight>
+    )
+}
+
+function Footer() {
+    return(
+        <View
+            style={{
+                marginBottom: 100,
+            }}
+        />
+    )
+}
+
+
 const styles = StyleSheet.create({
+    flatlist_separator: {
+        backgroundColor: "#504945",
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    new_category_button: {
+        backgroundColor: "#689d6a",
+        width: 120,
+        height: 40,
+        alignItems:"center",
+        justifyContent: "center",
+        elevation: 10,
+        borderRadius: 5,
+    },
+    new_category_button_text: {
+        color: "#d5c4a1",
+        fontSize: 14,
+        fontWeight: '500'
+    },
+
     notes_list_main_view: {
         flex: 1,
         width: "100%",
@@ -201,7 +272,7 @@ const styles = StyleSheet.create({
     },
     notes_list_header_view: {
         alignItems: "center",
-        justifyContent: "center",
+        justifyContent: "space-around",
         marginBottom: 20,
         flexDirection: "row"
     },
@@ -209,5 +280,25 @@ const styles = StyleSheet.create({
         fontSize: 25,
         fontWeight: "600",
         color: "#282828",
+    },
+
+
+
+    container: {
+        flex: 1,
+        paddingTop: StatusBar.currentHeight,
+        marginHorizontal: 16
+    },
+    item: {
+        backgroundColor: "#f9c2ff",
+        padding: 20,
+        marginVertical: 8
+    },
+    header: {
+        fontSize: 32,
+        backgroundColor: "#fff"
+    },
+    title: {
+        fontSize: 24
     }
 })
