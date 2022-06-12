@@ -16,6 +16,7 @@ import BadgeListView from "./badges/BadgeListView";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 import {CategoryClass} from "../custom_classes/CategoryClass";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 
 const SCREEN = Dimensions.get("screen");
@@ -150,7 +151,7 @@ export default function EditNoteView({route, navigation}) {
     )
 }
 
-function ColorSelector({changeColorMethod}) {
+export function ColorSelector({changeColorMethod, showCircleCS}) {
     const defaultColors = ["#fabd2f", "#83a598", "#d3869b", "#8ec07c"]
 
     return (
@@ -166,6 +167,12 @@ function ColorSelector({changeColorMethod}) {
                     </TouchableHighlight>
                 )
             }
+            <TouchableHighlight
+                onPress={showCircleCS}
+                style={styles.show_circle_cs_button}
+            >
+                <Icon name="add" size={35} color="#504945" />
+            </TouchableHighlight>
         </View>
     )
 }
@@ -249,6 +256,12 @@ const styles = StyleSheet.create({
     badges_view: {
         flexDirection: "row",
         width: SCREEN.width,
+    },
+    show_circle_cs_button: {
+        width: 50,
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center"
     }
 })
 

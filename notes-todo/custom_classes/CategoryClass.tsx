@@ -10,6 +10,7 @@ export class CategoryClass {
     //Bot Corner
     bx: number;
     by: number;
+    color: string;
 
     constructor(categoryName: string) {
         this._name = categoryName;

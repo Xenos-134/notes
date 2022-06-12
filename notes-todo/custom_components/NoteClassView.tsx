@@ -62,8 +62,9 @@ export default function NoteClassView(
 
     return (
             <Animated.View style={rStyle}>
-                <Animated.View style={[styles.noteCategoryOut, categoryViewDimensions]}>
-                    <View style={styles.note_category_view}>
+                <Animated.View style={[styles.noteCategoryOut, categoryViewDimensions, {borderColor: category.color}]}>
+                    <View style={
+                        [styles.note_category_view, {backgroundColor: category.color},]}>
                         <Text style={styles.note_category_text}>
                             {category._name}
                         </Text>

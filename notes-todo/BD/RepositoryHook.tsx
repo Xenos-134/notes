@@ -210,6 +210,23 @@ export function RepositoryHook() {
         return parsedCategory;
     }
 
+
+    async function changeCategoryColor(categoryId: string, newColor: string) {
+        const category = await getCategory(categoryId);
+        if(!category) return;
+        category.color = newColor;
+        console.log("NEW CAHNGED COLOR CATEGORY", category);
+        AsyncStorage.setItem(categoryId, JSON.stringify(category));
+    }
+
+    async function changeCategory(category) {
+        console.log("NEW CAHNGED CATEGORY", category);
+
+        if(!category) return;
+        AsyncStorage.setItem(category._name, JSON.stringify(category));
+    }
+
+
     //===========================================================
     //             TESTING NOTES CATEGORY (END)
     //===========================================================
@@ -227,6 +244,9 @@ export function RepositoryHook() {
         loadCategories,
         changeCategoryPosition,
         addCategoryToNote,
-        removeCategoryFromNote
+        removeCategoryFromNote,
+        changeCategoryColor,
+        getCategoryById,
+        changeCategory
     }
 }

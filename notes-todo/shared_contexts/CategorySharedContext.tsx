@@ -12,4 +12,5 @@ export const CategorySharedContext = React.createContext({
     removeNoteFromCategory: Noot,
     calculateNewPosition: Noot,
     getAllCategories: Noot,
+    changeCategor: Noot,
 });

@@ -16,6 +16,7 @@ import {NoteClass} from "./custom_classes/NoteClass";
 import {NoteSharedContext} from "./shared_contexts/NotesSharedContext";
 import {ViewDimensionsContext} from "./shared_contexts/ViewDimensionContext";
 import EditCategoryView from "./custom_components/EditCategoryView";
+import {hasColorProps} from "react-native-reanimated/lib/types/lib/reanimated2/hook/utils";
 
 
 const Stack = createStackNavigator();
@@ -114,6 +115,11 @@ function App() {
         return categories;
     }
 
+    // @ts-ignore
+    noteCategoryContext.changeCategory = async function(category: CategoryClass) {
+        repository.changeCategory(category);
+    }
+
     //===========================================================
     //              Note  Context
     //===========================================================
@@ -170,8 +176,8 @@ function App() {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{headerShown: false}}>
-                <Stack.Screen name="Edit Category" component={EditCategoryView}/>
                 <Stack.Screen name="MainScreen" component={MainScreen} />
+                <Stack.Screen name="Edit Category" component={EditCategoryView}/>
                 <Stack.Screen name="Edit Note" component={EditNoteView} />
                 <Stack.Screen name="Notes List" component={NotesListView} options={{cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,}} />
             </Stack.Navigator>

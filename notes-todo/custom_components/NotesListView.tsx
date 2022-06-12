@@ -19,6 +19,7 @@ import {RepositoryHook} from "../BD/RepositoryHook";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 import LoadingView from "./LoadingView";
+import {CategoryClass} from "../custom_classes/CategoryClass";
 
 export default function NotesListView({navigation, route}) {
     //===========================================================
@@ -138,6 +139,12 @@ export default function NotesListView({navigation, route}) {
         )
     }
 
+    async function editCategory(categoryId: string) {
+        const category = await repository.getCategoryById(categoryId);
+        if(!category) return;
+        navigation.navigate("Edit Category", {category});
+    }
+
     return (
         <View style={styles.notes_list_main_view}>
             {
@@ -158,7 +165,9 @@ export default function NotesListView({navigation, route}) {
                     keyExtractor={(item, index) => item + index}
                     renderItem={({ item }) => <Item note={item} />}
                     renderSectionHeader={({ section: { title } }) => (
-                        <Separator text={title}/>
+                        <Separator
+                            method={editCategory}
+                            text={title}/>
                     )}
                     ListFooterComponent={()=> <Footer/>}
                 />
@@ -190,13 +199,19 @@ function Box(deleteMethod, editNote, findNote, note) {
 }
 
 
-const Separator = ({ text }) => (
+const Separator = ({ text, method }) => (
     <View style={styles.flatlist_separator}>
         <Text style={{
             color: "#ebdbb2",
             fontSize: 18,
             fontWeight: "700",
         }}>{text}</Text>
+        <TouchableHighlight
+            style={styles.edit_category_view}
+            onPress={()=>method(text)}
+        >
+            <Icon name="edit" size={30} color="#ebdbb2" />
+        </TouchableHighlight>
     </View>
 );
 
@@ -307,5 +322,9 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24
+    },
+    edit_category_view: {
+        position: "absolute",
+        right: 20,
     }
 })
