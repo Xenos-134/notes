@@ -20,6 +20,7 @@ export class CategoryClass {
 
         this.bx = 0;
         this.by = 0;
+        this.color = "#282828";
     }
 
     get name() : string {

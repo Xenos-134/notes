@@ -1,7 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {NoteClass} from "../custom_classes/NoteClass";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {CategoryClass} from "../custom_classes/CategoryClass";
+import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 
 
 const noteStorageKey = "@notesList";
@@ -9,6 +10,8 @@ const CATEGORY_KEYS = "@categoriesKeysList";
 
 
 export function RepositoryHook() {
+    const categorySharedContext = useContext(CategorySharedContext);
+
     useEffect(()=>{
         //AsyncStorage.clear();
     },[])
@@ -111,7 +114,9 @@ export function RepositoryHook() {
     async function addNoteToCategory(note: NoteClass ,category: CategoryClass) {
         const loadedCategory = await getCategory(category._name);
         loadedCategory.notesList.push(note._id);
-        AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory));
+        await AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory)).then(() =>
+            categorySharedContext.updateCategoryListMainScreen()
+        );
     }
 
     async function changeCategoryPosition(category : CategoryClass) {
@@ -163,6 +168,7 @@ export function RepositoryHook() {
 
 
     async function addCategoryToNote(noteId: string, cat: CategoryClass) {
+
         const notes = await getAllNotes();
         const note = notes.find(n => n._id === noteId);
 
@@ -171,7 +177,6 @@ export function RepositoryHook() {
         //FIXME E- REMOVER ESTA PARTE
         if(note._categories.some(c => c._name == cat._name)) return;
         note._categories.push(cat);
-        console.log("NOTE: ", notes);
         updateNotes(notes);
     }
 
@@ -200,7 +205,9 @@ export function RepositoryHook() {
         // @ts-ignore
         category.notesList = category.notesList.filter(n => n._id == noteId);
         console.log("NEW CATEGORY:", category);
-        AsyncStorage.setItem(categoryId, JSON.stringify(category));
+        await AsyncStorage.setItem(categoryId, JSON.stringify(category)).then(()=> {
+            categorySharedContext.updateCategoryListMainScreen()
+        });
     }
 
     async function getCategoryById(catId: string) {

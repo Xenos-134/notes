@@ -17,9 +17,10 @@ import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 import {NoteSharedContext} from "../shared_contexts/NotesSharedContext";
 import {CategoryClass} from "../custom_classes/CategoryClass";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import {ColorSelector as RoundColorSelector} from "./EditCategoryView";
 
 const SCREEN = Dimensions.get("screen");
+const DEFAULT_COLOR = "#ffffff";
 
 export default function EditNoteView({route, navigation}) {
     const [title, setTitle] = useState(route.params.targetNote._title);
@@ -27,6 +28,8 @@ export default function EditNoteView({route, navigation}) {
     const [color, setColor] = useState("#fabd2f");
     const [openCategorySelector, setOCS] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [defaultColor, setDefaultColor] = useState("")
+    const [csVisibility, setCSV] = useState(false);
 
     //TODO ADICIONAR SELECTOR DE CORES RADIAL
     //===========================================================
@@ -35,12 +38,12 @@ export default function EditNoteView({route, navigation}) {
     const categoryContext = useContext(CategorySharedContext);
     const noteContext = useContext(NoteSharedContext);
 
-
     useEffect(()=>{
         console.log("RECEIVED TODO", route.params.targetNote)
         if(route.params.targetNote._color != null) {
             setColor(route.params.targetNote._color);
         }
+        setDefaultColor(route.params.targetNote._color);
         loadNoteBadges();
     },[])
 
@@ -51,7 +54,7 @@ export default function EditNoteView({route, navigation}) {
             badgeNamesList.push(elm._name);
         })
 
-        console.log("LOADED CATEGORIES:", badgeNamesList);
+        console.log("LOADED CATEGORIES:", badgeList);
         setCategories(badgeList);
     }
 
@@ -75,13 +78,26 @@ export default function EditNoteView({route, navigation}) {
         setColor(color);
     }
 
+    function cancelColorSelection() {
+        setColor(defaultColor);
+    }
+
+    function showColorSelector() {
+        console.log('AAAAAAAAAAAa')
+        setCSV(!csVisibility);
+    }
+
+    function previewSelectColor(color: string) {
+        if(color == DEFAULT_COLOR) return;
+        setColor(color);
+    }
+
     function openCategoryList() {
         categoryContext.calculateNewPosition(route.params.targetNote);
         setOCS(!openCategorySelector);
     }
 
     async function removeCategory(cat: CategoryClass) {
-        console.log("BADGE LIST", categories);
         await noteContext.removeCategoryFromNote(route.params.targetNote._id, cat);
         const newCategoryList = categories.filter(elm => elm._name != cat._name);
         setCategories([...newCategoryList]);
@@ -90,7 +106,6 @@ export default function EditNoteView({route, navigation}) {
     function addCategory(cat: CategoryClass) {
         //FOR SOME REASON .includes dnt work here
         const exist = categories.some(c => c._name == cat._name);
-        console.log("EXIST: ", exist)
         openCategoryList();
         if(exist) return;
         setCategories([...categories, cat]);
@@ -99,6 +114,12 @@ export default function EditNoteView({route, navigation}) {
     return (
         <View style={[styles.edit_note_view, {backgroundColor: color}]}>
             <View style={styles.edit_note_text_view}>
+                <RoundColorSelector
+                    visible={csVisibility}
+                    selectColor={previewSelectColor}
+                    visibMethod={showColorSelector}
+                    cancelMethod={cancelColorSelection}
+                />
                 <TextInput
                     style={styles.edit_note_title_text_input}
                     value={title}
@@ -131,7 +152,9 @@ export default function EditNoteView({route, navigation}) {
                         categoriesList={categoryContext.categoryList}/>
                 }
             </View>
-            <ColorSelector changeColorMethod={changeColor} />
+            <ColorSelector
+                showCircleCS={showColorSelector}
+                changeColorMethod={changeColor} />
             <View style={styles.buttons_view}>
                 <TouchableHighlight
                     onPress={saveNoteChanges}

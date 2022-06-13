@@ -83,6 +83,7 @@ export default function NotesListView({navigation, route}) {
         console.log("CREATINGNEW CATEGORY:", categoryName);
         //repository.addNewCategory(categoryName);
         categoryContext.addCategory(categoryName);
+        categoryContext.updateCategoryListMainScreen();
         hideCategotryForm();
     }
 
@@ -129,6 +130,7 @@ export default function NotesListView({navigation, route}) {
         console.log("NON CATEGORY NOTES",non_category_notes);
         //Adding notes withou category
         noteCategoryList.push({title: "Without Category", data: non_category_notes});
+        noteCategoryList = noteCategoryList.filter(elm => elm.data.length > 0);
         setNotesList(noteCategoryList);
         setLoaded(true);
     }

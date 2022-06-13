@@ -58,7 +58,7 @@ function App() {
 
     // @ts-ignore
     noteCategoryContext.addNoteToCategory = async function(note: NoteClass, category: CategoryClass) {
-        repository.addNoteToCategory(note, category);
+        await repository.addNoteToCategory(note, category);
     }
 
 
@@ -139,6 +139,7 @@ function App() {
     // @ts-ignore
     noteContext.loadNoteCategories = async function(noteId: string) {
         const note = await repository.getNoteById(noteId);
+        console.log("SSSSSSSSSSSSSSSSSSSS",note)
         if(note._categories == null) return [];
         return note._categories;
     }

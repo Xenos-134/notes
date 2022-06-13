@@ -5,7 +5,7 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 export default function NoteClassView(
     {
@@ -13,10 +13,14 @@ export default function NoteClassView(
         referentialY,
         scale,
         category,
+        numOfChilds
     }) {
 
+    const [visible, setVisible] = useState(false);
 
     useEffect(()=>{
+        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx NUM OF CHILDS: ", numOfChilds);
+        if(numOfChilds > 1) setVisible(true);
     },[])
 
 
@@ -59,12 +63,12 @@ export default function NoteClassView(
         };
     });
 
-
+    
     return (
             <Animated.View style={rStyle}>
                 <Animated.View style={[styles.noteCategoryOut, categoryViewDimensions, {borderColor: category.color}]}>
                     <View style={
-                        [styles.note_category_view, {backgroundColor: category.color},]}>
+                        [styles.note_category_view, {backgroundColor: category.color?category.color:"#282828"},]}>
                         <Text style={styles.note_category_text}>
                             {category._name}
                         </Text>

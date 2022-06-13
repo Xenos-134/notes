@@ -8,7 +8,7 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useReducer, useRef, useState} from "react";
 import { Dimensions } from 'react-native';
 
 
@@ -45,12 +45,11 @@ export default function MainScreen({navigation}) {
     useEffect(()=>{
         console.log("CREATING NEW CATEGORY")
         const category1 = createNewCategory("Test Category 1");
-        loadCategoriesFromRepository();
+        categorySharedContext.updateCategoryListMainScreen = loadCategoriesFromRepository;
+        categorySharedContext.updateCategoryListMainScreen();
         category1.setPosition(100, -350);
         pushCategory(category1);
-
         viewDimensionsContext.scaleValue = scaleValue.value;
-
     },[])
 
     function createNewCategory(name: string) {
@@ -65,9 +64,9 @@ export default function MainScreen({navigation}) {
 
     async function loadCategoriesFromRepository() {
         const loaded_categories =  await repository.loadCategories();
-        console.log("LOADED CATEGORIES", loadedCategories);
         // @ts-ignore
-        setLoadedCategories(loaded_categories);
+        setLoadedCategories([...loaded_categories]);
+        console.log("RELOADING:", loaded_categories);
     }
 
     useEffect(()=>{
@@ -90,6 +89,7 @@ export default function MainScreen({navigation}) {
     //              SHARED CONTEXT
     //===========================================================
     const viewDimensionsContext = useContext(ViewDimensionsContext);
+    const categorySharedContext = useContext(CategorySharedContext);
 
 
     //===========================================================
@@ -253,6 +253,7 @@ export default function MainScreen({navigation}) {
                                     referentialY={transformValueY}
                                     scale={scaleValue}
                                     category={category}
+                                    numOfChilds={category.notesList.length}
                                 />
                             ))
                         }

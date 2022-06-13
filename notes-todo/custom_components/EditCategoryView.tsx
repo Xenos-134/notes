@@ -3,10 +3,11 @@ import {View, Text, StyleSheet, Dimensions, TouchableHighlight, TextInput} from 
 import ColorPicker from 'react-native-wheel-color-picker'
 import {RepositoryHook} from "../BD/RepositoryHook";
 import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
-import {ColorSelector as CustomColorSelecto} from "./EditNoteView";
+import {ColorSelector as CustomColorSelector} from "./EditNoteView";
 
 
 const SCREEN = Dimensions.get("screen");
+const DEFAULT_COLOR = "#ffffff";
 
 export default function EditCategoryView({navigation, route}) {
     //===========================================================
@@ -41,7 +42,12 @@ export default function EditCategoryView({navigation, route}) {
         setCSV(!csVisibility);
     }
 
+    function cancelColorSelection() {
+        setColor(defaultColor);
+    }
+
     function previewSelectColor(color: string) {
+        if(color == DEFAULT_COLOR) return;
         console.log("SELECTED COLOR", color);
         setColor(color);
         if(!category) return;
@@ -59,6 +65,7 @@ export default function EditCategoryView({navigation, route}) {
         console.log("CATEGORY:" , category)
         categorySharedContext.changeCategory(category);
         navigation.goBack();
+        categorySharedContext.updateCategoryListMainScreen();
     }
 
     function changeCategoryName(text) {
@@ -78,7 +85,7 @@ export default function EditCategoryView({navigation, route}) {
                     onChangeText={changeCategoryName}
                 />
             </View>
-            <CustomColorSelecto
+            <CustomColorSelector
                 showCircleCS={showColorSelector}
                 changeColorMethod={previewSelectColor}
             />
@@ -86,6 +93,7 @@ export default function EditCategoryView({navigation, route}) {
                 visible={csVisibility}
                 selectColor={previewSelectColor}
                 visibMethod={showColorSelector}
+                cancelMethod={cancelColorSelection}
             />
             <View style={styles.bottom_buttons_view} >
                 <TouchableHighlight
@@ -106,13 +114,14 @@ export default function EditCategoryView({navigation, route}) {
 }
 
 
-function ColorSelector({selectColor, visible, visibMethod}) {
+export function ColorSelector({selectColor, visible, visibMethod, cancelMethod}) {
     return(
         <View
             style={{
                 position: "absolute",
                 top: SCREEN.height * 0.2,
                 alignSelf: "center",
+                zIndex: 20,
 
             }}
         >
@@ -130,7 +139,7 @@ function ColorSelector({selectColor, visible, visibMethod}) {
                         </TouchableHighlight>
                         <TouchableHighlight
                             style={styles.cancel_button}
-                            onPress={visibMethod}
+                            onPress={()=>{visibMethod(); cancelMethod();}}
                         >
                             <Text style={styles.color_selector_text}>Cancel</Text>
                         </TouchableHighlight>
