@@ -5,7 +5,8 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
+import {CategorySharedContext} from "../shared_contexts/CategorySharedContext";
 
 export default function NoteClassView(
     {
@@ -17,11 +18,22 @@ export default function NoteClassView(
     }) {
 
     const [visible, setVisible] = useState(false);
+    const categorySharedContext = useContext(CategorySharedContext);
 
     useEffect(()=>{
-        if(numOfChilds > 1) setVisible(true);
+        if(numOfChilds >= 1) setVisible(true);
+        categorySharedContext.updateCategoryVisibility = forceRerender;
     },[])
 
+
+    function forceRerender(categoryName, visib) {
+        console.log("=============RERENDERING===========", category._name);
+
+        if(category._name == categoryName) {
+
+            setVisible(true);
+        }
+    }
 
     const rStyle = useAnimatedStyle(() => {
         return {
@@ -61,7 +73,10 @@ export default function NoteClassView(
         };
     });
 
-    
+
+    if(!visible)
+        return <></>
+
     return (
             <Animated.View style={rStyle}>
                 <Animated.View style={[styles.noteCategoryOut, categoryViewDimensions, {borderColor: category.color}]}>

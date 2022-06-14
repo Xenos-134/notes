@@ -113,6 +113,8 @@ export function RepositoryHook() {
 
     async function addNoteToCategory(note: NoteClass ,category: CategoryClass) {
         const loadedCategory = await getCategory(category._name);
+        console.log("===============LOADED CATEGORY================", loadedCategory.notesList.length);
+        if(loadedCategory.notesList.length == 0) categorySharedContext.updateCategoryVisibility(category._name, true);
         loadedCategory.notesList.push(note._id);
         await AsyncStorage.setItem(loadedCategory._name, JSON.stringify(loadedCategory)).then(() =>
             categorySharedContext.updateCategoryListMainScreen()
@@ -203,7 +205,6 @@ export function RepositoryHook() {
     async function removeNoteFromCategory(noteId: string, categoryId: string) {
         const category = await getCategoryById(categoryId);
 
-
         // @ts-ignore
         category.notesList = category.notesList.filter(n => n != noteId);
 
@@ -213,6 +214,8 @@ export function RepositoryHook() {
         await AsyncStorage.setItem(categoryId, JSON.stringify(category)).then(()=> {
             categorySharedContext.updateCategoryListMainScreen()
         });
+
+        categorySharedContext.updateCategoryListMainScreen();
     }
 
     async function getCategoryById(catId: string) {

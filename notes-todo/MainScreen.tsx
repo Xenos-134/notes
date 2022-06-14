@@ -1,4 +1,4 @@
-import {Button, LogBox, StyleSheet, Text, View} from 'react-native';
+import {Button, FlatList, LogBox, StyleSheet, Text, View} from 'react-native';
 import Animated, {
     runOnJS,
     useAnimatedGestureHandler,
@@ -10,6 +10,7 @@ import Animated, {
 import {GestureHandlerRootView, PanGestureHandler, PanGestureHandlerGestureEvent} from "react-native-gesture-handler";
 import {useContext, useEffect, useReducer, useRef, useState} from "react";
 import { Dimensions } from 'react-native';
+import {useIsFocused} from "@react-navigation/native";
 
 
 //CUSTOM COMPONENTS IMPORT
@@ -41,7 +42,6 @@ export default function MainScreen({navigation}) {
     const [loadedCategories, setLoadedCategories] = useState([]);
     const categoryContext = useContext(CategorySharedContext);
 
-
     useEffect(()=>{
         const category1 = createNewCategory("Test Category 1");
         categorySharedContext.updateCategoryListMainScreen = loadCategoriesFromRepository;
@@ -49,6 +49,7 @@ export default function MainScreen({navigation}) {
         category1.setPosition(100, -350);
         pushCategory(category1);
         viewDimensionsContext.scaleValue = scaleValue.value;
+
     },[])
 
     function createNewCategory(name: string) {
@@ -63,8 +64,11 @@ export default function MainScreen({navigation}) {
 
     async function loadCategoriesFromRepository() {
         const loaded_categories =  await repository.loadCategories();
+        const new_filtered_cats = loaded_categories.filter(e=> e.notesList.length != 0);
+        console.log("NEW CATEGORY LIST: ", loaded_categories);
         // @ts-ignore
-        setLoadedCategories([...loaded_categories]);
+        setLoadedCategories([...new_filtered_cats]);
+
     }
 
 

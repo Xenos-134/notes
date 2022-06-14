@@ -14,4 +14,5 @@ export const CategorySharedContext = React.createContext({
     getAllCategories: Noot,
     changeCategor: Noot,
     updateCategoryListMainScreen: Noot,
+    updateCategoryVisibility: Noot,
 });
