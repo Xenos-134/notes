@@ -183,13 +183,14 @@ export function RepositoryHook() {
     async function removeCategoryFromNote(noteId: string, cat: CategoryClass) {
         const notes = await getAllNotes();
         const note = notes.find(n => n._id === noteId);
-
+        console.log("-----------------------")
+        console.log(notes);
+        console.log("-----------------------")
         //FIXME S- REMOVER ESTA PARTE
         if(note._categories == null) note._categories = [];
         //FIXME E- REMOVER ESTA PARTE
-        console.log(">>>NOTE: ", note._categories);
         await removeNoteFromCategory(noteId, cat._name);
-        note._categories = note._categories.filter(c => c._name !== cat._name);
+        note._categories = note._categories.filter(c => c._name != cat._name);
         const newNoteList = await updateNotes(notes);
         return newNoteList;
     }
@@ -202,9 +203,13 @@ export function RepositoryHook() {
     async function removeNoteFromCategory(noteId: string, categoryId: string) {
         const category = await getCategoryById(categoryId);
 
+
         // @ts-ignore
-        category.notesList = category.notesList.filter(n => n._id == noteId);
-        console.log("NEW CATEGORY:", category);
+        category.notesList = category.notesList.filter(n => n != noteId);
+
+        console.log("-----------------------", noteId)
+        console.log(category);
+        console.log("-----------------------")
         await AsyncStorage.setItem(categoryId, JSON.stringify(category)).then(()=> {
             categorySharedContext.updateCategoryListMainScreen()
         });
@@ -222,12 +227,10 @@ export function RepositoryHook() {
         const category = await getCategory(categoryId);
         if(!category) return;
         category.color = newColor;
-        console.log("NEW CAHNGED COLOR CATEGORY", category);
         AsyncStorage.setItem(categoryId, JSON.stringify(category));
     }
 
     async function changeCategory(category) {
-        console.log("NEW CAHNGED CATEGORY", category);
 
         if(!category) return;
         AsyncStorage.setItem(category._name, JSON.stringify(category));

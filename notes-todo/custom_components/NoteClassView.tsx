@@ -19,7 +19,6 @@ export default function NoteClassView(
     const [visible, setVisible] = useState(false);
 
     useEffect(()=>{
-        console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx NUM OF CHILDS: ", numOfChilds);
         if(numOfChilds > 1) setVisible(true);
     },[])
 
@@ -55,7 +54,6 @@ export default function NoteClassView(
         const categoryViewWidth = category.x - category.bx;
         const categoryViewHeight = category.y - category.by;
 
-        console.log(`Name ${category._name}: Width: ${categoryViewWidth} Heigth: ${categoryViewHeight}`);
 
         return {
             width: calculateViewWidth(category.x, category.bx),

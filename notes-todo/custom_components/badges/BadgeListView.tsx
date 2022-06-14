@@ -12,7 +12,6 @@ export default function BadgeListView({categoriesList, note, add}) {
     const noteContext = useContext(NoteSharedContext);
 
     async function addNoteToCategory(category: CategoryClass) {
-        console.log("ADDING :", category)
         categoryContext.addNoteToCategory(note, category);
         noteContext.addCategoryToNote(note._id, category);
         add(category);

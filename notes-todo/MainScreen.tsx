@@ -43,7 +43,6 @@ export default function MainScreen({navigation}) {
 
 
     useEffect(()=>{
-        console.log("CREATING NEW CATEGORY")
         const category1 = createNewCategory("Test Category 1");
         categorySharedContext.updateCategoryListMainScreen = loadCategoriesFromRepository;
         categorySharedContext.updateCategoryListMainScreen();
@@ -66,16 +65,10 @@ export default function MainScreen({navigation}) {
         const loaded_categories =  await repository.loadCategories();
         // @ts-ignore
         setLoadedCategories([...loaded_categories]);
-        console.log("RELOADING:", loaded_categories);
     }
-
-    useEffect(()=>{
-        console.log(">>>",categories);
-    },[categories])
 
 
     function addNoteToCategory(note : NoteClass) {
-        console.log("ADDING NOTE TO CATEGORY", note._title);
     }
 
     //===========================================================
@@ -106,7 +99,6 @@ export default function MainScreen({navigation}) {
     function navigateToPosition(x:number, y:number) {
         transformValueX.value = (x - SCREEN_DIMENSION.width*0.2);
         transformValueY.value = (y - SCREEN_DIMENSION.height*0.5);
-        console.log("NAVIGATING TO ANOTHER POSITION")
     }
 
     //===========================================================
