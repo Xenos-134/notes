@@ -46,10 +46,6 @@ export default function NotesListView({navigation, route}) {
         setN(route.params.notesList);
     },[])
 
-    function deleteItem(item) {
-        const nCoppy = n.filter(elm => elm.title != item.title);
-        setN([...nCoppy]);
-    }
 
     function closeAllElm(note) {
         a.current[note.title].close();
@@ -58,7 +54,19 @@ export default function NotesListView({navigation, route}) {
     function deleteNote(note) {
         closeAllElm(note);
         const notesCoppy = n.filter(elm => elm.title != note.title);
-        setN([...notesCoppy]);
+        noteContext.deleteNote(note);
+        var newNotesList = [];
+        notesList.map( cat => {
+            var catObject = {title: cat.title, data: []}
+            cat['data'].map( elm => {
+                if(elm._id == note._id) {console.log("DELETING :", elm._id);}
+                else {
+                    catObject.data.push(elm);
+                }
+            })
+            if(catObject.data.length > 0) newNotesList.push(catObject);
+        })
+        setNotesList(newNotesList);
     }
 
     function editNote(note) {
@@ -108,11 +116,6 @@ export default function NotesListView({navigation, route}) {
         const notes = await noteContext.getAllNotes();
         var non_category_notes = notes;
         const categories = await categoryContext.getAllCategories();
-        console.log('======================LOADED NOTES ==================');
-        console.log(notes);
-        console.log('=====================LOADED  CATEGORIES==================');
-        console.log(categories);
-        console.log('============================================');
 
         var noteCategoryList = []
 
@@ -126,9 +129,7 @@ export default function NotesListView({navigation, route}) {
             })
             noteCategoryList.push({title: c._name, data: notesList});
         })
-        //console.log("CATEGORY NOTES ARRAY: ", noteCategoryList);
-        console.log("NON CATEGORY NOTES",non_category_notes);
-        //Adding notes withou category
+
         noteCategoryList.push({title: "Without Category", data: non_category_notes});
         noteCategoryList = noteCategoryList.filter(elm => elm.data.length > 0);
         setNotesList(noteCategoryList);

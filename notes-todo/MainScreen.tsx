@@ -25,6 +25,7 @@ import {CategoryClass} from "./custom_classes/CategoryClass";
 import NoteClassView from "./custom_components/NoteClassView";
 import {CategorySharedContext} from "./shared_contexts/CategorySharedContext";
 import {ViewDimensionsContext} from "./shared_contexts/ViewDimensionContext";
+import {NoteSharedContext} from "./shared_contexts/NotesSharedContext";
 
 type ContextType = {
     translateX: number;
@@ -43,12 +44,10 @@ export default function MainScreen({navigation}) {
     const categoryContext = useContext(CategorySharedContext);
 
     useEffect(()=>{
-        const category1 = createNewCategory("Test Category 1");
         categorySharedContext.updateCategoryListMainScreen = loadCategoriesFromRepository;
         categorySharedContext.updateCategoryListMainScreen();
-        category1.setPosition(100, -350);
-        pushCategory(category1);
         viewDimensionsContext.scaleValue = scaleValue.value;
+        notesSharedContext.deleteNote = deleteNote;
 
     },[])
 
@@ -87,6 +86,7 @@ export default function MainScreen({navigation}) {
     //===========================================================
     const viewDimensionsContext = useContext(ViewDimensionsContext);
     const categorySharedContext = useContext(CategorySharedContext);
+    const notesSharedContext = useContext(NoteSharedContext);
 
 
     //===========================================================
@@ -219,7 +219,6 @@ export default function MainScreen({navigation}) {
             navigateToPosition,
         });
     }
-
 
     function deleteNote(note: NoteClass) {
         const filtered_notes = notesList.filter(elm => elm._id != note._id);

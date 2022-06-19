@@ -11,4 +11,5 @@ export const NoteSharedContext = React.createContext({
     getAllNotes: Noot,
     changeColor: Noot,
     changeName: Noot,
+    deleteNote: Noot,
 })
